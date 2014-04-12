@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<plugin name="HttpTest"
+        displayName="HttpTest plugin"
+        package="org.rhq.plugins.httptest1"
+        version="2.0"
+        description="Monitoring of http servers"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:xmlns:rhq-plugin"
+        xmlns:c="urn:xmlns:rhq-configuration">
+
+   <server name="HttpServer"
+             discovery="HttpDiscoveryComponent"
+             class="HttpComponent"
+             description="Http Server"
+             >
+    <metric property="responseTime"
+            displayName="Response Time"
+            measurementType="dynamic"
+            units="milliseconds"
+            displayType="summary"/>
+
+    <metric property="status"
+            displayName="Status Code"
+            dataType="trait"
+            displayType="summary"/>
+
+   </server>
+
+</plugin>

@@ -1,0 +1,2965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="generator" content="Asciidoctor 0.1.4">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to write a(n agent) plugin for RHQ and JBoss ON?</title>
+<style>
+/* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary { display: block; }
+audio, canvas, video { display: inline-block; }
+audio:not([controls]) { display: none; height: 0; }
+[hidden] { display: none; }
+html { background: #fff; color: #000; font-family: sans-serif; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+a:focus { outline: thin dotted; }
+a:active, a:hover { outline: 0; }
+h1 { font-size: 2em; margin: 0.67em 0; }
+abbr[title] { border-bottom: 1px dotted; }
+b, strong { font-weight: bold; }
+dfn { font-style: italic; }
+hr { -moz-box-sizing: content-box; box-sizing: content-box; height: 0; }
+mark { background: #ff0; color: #000; }
+code, kbd, pre, samp { font-family: monospace, serif; font-size: 1em; }
+pre { white-space: pre-wrap; }
+q { quotes: "\201C" "\201D" "\2018" "\2019"; }
+small { font-size: 80%; }
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sup { top: -0.5em; }
+sub { bottom: -0.25em; }
+img { border: 0; }
+svg:not(:root) { overflow: hidden; }
+figure { margin: 0; }
+fieldset { border: 1px solid #c0c0c0; margin: 0 2px; padding: 0.35em 0.625em 0.75em; }
+legend { border: 0; padding: 0; }
+button, input, select, textarea { font-family: inherit; font-size: 100%; margin: 0; }
+button, input { line-height: normal; }
+button, select { text-transform: none; }
+button, html input[type="button"], input[type="reset"], input[type="submit"] { -webkit-appearance: button; cursor: pointer; }
+button[disabled], html input[disabled] { cursor: default; }
+input[type="checkbox"], input[type="radio"] { box-sizing: border-box; padding: 0; }
+input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
+input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
+button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
+textarea { overflow: auto; vertical-align: top; }
+table { border-collapse: collapse; border-spacing: 0; }
+*, *:before, *:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+html, body { font-size: 100%; }
+body { background: white; color: #222222; padding: 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
+a:hover { cursor: pointer; }
+a:focus { outline: none; }
+img, object, embed { max-width: 100%; height: auto; }
+object, embed { height: 100%; }
+img { -ms-interpolation-mode: bicubic; }
+#map_canvas img, #map_canvas embed, #map_canvas object, .map_canvas img, .map_canvas embed, .map_canvas object { max-width: none !important; }
+.left { float: left !important; }
+.right { float: right !important; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+.text-center { text-align: center !important; }
+.text-justify { text-align: justify !important; }
+.hide { display: none; }
+.antialiased, body { -webkit-font-smoothing: antialiased; }
+img { display: inline-block; vertical-align: middle; }
+textarea { height: auto; min-height: 50px; }
+select { width: 100%; }
+p.lead, .paragraph.lead > p, #preamble > .sectionbody > .paragraph:first-of-type p { font-size: 1.21875em; line-height: 1.6; }
+.subheader, #content #toctitle, .admonitionblock td.content > .title, .exampleblock > .title, .imageblock > .title, .videoblock > .title, .listingblock > .title, .literalblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, .sidebarblock > .title, .tableblock > .title, .verseblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title, .tableblock > caption { line-height: 1.4; color: #7a2518; font-weight: 300; margin-top: 0.2em; margin-bottom: 0.5em; }
+div, dl, dt, dd, ul, ol, li, h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6, pre, form, p, blockquote, th, td { margin: 0; padding: 0; direction: ltr; }
+a { color: #005498; text-decoration: underline; line-height: inherit; }
+a:hover, a:focus { color: #00467f; }
+a img { border: none; }
+p { font-family: inherit; font-weight: normal; font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; text-rendering: optimizeLegibility; }
+p aside { font-size: 0.875em; line-height: 1.35; font-style: italic; }
+h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { font-family: Georgia, "URW Bookman L", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; color: #ba3925; text-rendering: optimizeLegibility; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.2125em; }
+h1 small, h2 small, h3 small, #toctitle small, .sidebarblock > .content > .title small, h4 small, h5 small, h6 small { font-size: 60%; color: #e99b8f; line-height: 0; }
+h1 { font-size: 2.125em; }
+h2 { font-size: 1.6875em; }
+h3, #toctitle, .sidebarblock > .content > .title { font-size: 1.375em; }
+h4 { font-size: 1.125em; }
+h5 { font-size: 1.125em; }
+h6 { font-size: 1em; }
+hr { border: solid #dddddd; border-width: 1px 0 0; clear: both; margin: 1.25em 0 1.1875em; height: 0; }
+em, i { font-style: italic; line-height: inherit; }
+strong, b { font-weight: bold; line-height: inherit; }
+small { font-size: 60%; line-height: inherit; }
+code { font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; color: #6d180b; }
+ul, ol, dl { font-size: 1em; line-height: 1.6; margin-bottom: 1.25em; list-style-position: outside; font-family: inherit; }
+ul, ol { margin-left: 1.5em; }
+ul li ul, ul li ol { margin-left: 1.25em; margin-bottom: 0; font-size: 1em; }
+ul.square li ul, ul.circle li ul, ul.disc li ul { list-style: inherit; }
+ul.square { list-style-type: square; }
+ul.circle { list-style-type: circle; }
+ul.disc { list-style-type: disc; }
+ul.no-bullet { list-style: none; }
+ol li ul, ol li ol { margin-left: 1.25em; margin-bottom: 0; }
+dl dt { margin-bottom: 0.3125em; font-weight: bold; }
+dl dd { margin-bottom: 1.25em; }
+abbr, acronym { text-transform: uppercase; font-size: 90%; color: #222222; border-bottom: 1px dotted #dddddd; cursor: help; }
+abbr { text-transform: none; }
+blockquote { margin: 0 0 1.25em; padding: 0.5625em 1.25em 0 1.1875em; border-left: 1px solid #dddddd; }
+blockquote cite { display: block; font-size: inherit; color: #555555; }
+blockquote cite:before { content: "\2014 \0020"; }
+blockquote cite a, blockquote cite a:visited { color: #555555; }
+blockquote, blockquote p { line-height: 1.6; color: #6f6f6f; }
+.vcard { display: inline-block; margin: 0 0 1.25em 0; border: 1px solid #dddddd; padding: 0.625em 0.75em; }
+.vcard li { margin: 0; display: block; }
+.vcard .fn { font-weight: bold; font-size: 0.9375em; }
+.vevent .summary { font-weight: bold; }
+.vevent abbr { cursor: auto; text-decoration: none; font-weight: bold; border: none; padding: 0 0.0625em; }
+@media only screen and (min-width: 768px) { h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 { line-height: 1.4; }
+  h1 { font-size: 2.75em; }
+  h2 { font-size: 2.3125em; }
+  h3, #toctitle, .sidebarblock > .content > .title { font-size: 1.6875em; }
+  h4 { font-size: 1.4375em; } }
+.print-only { display: none !important; }
+@media print { * { background: transparent !important; color: #000 !important; box-shadow: none !important; text-shadow: none !important; }
+  a, a:visited { text-decoration: underline; }
+  a[href]:after { content: " (" attr(href) ")"; }
+  abbr[title]:after { content: " (" attr(title) ")"; }
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
+  pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page { margin: 0.5cm; }
+  p, h2, h3, #toctitle, .sidebarblock > .content > .title { orphans: 3; widows: 3; }
+  h2, h3, #toctitle, .sidebarblock > .content > .title { page-break-after: avoid; }
+  .hide-on-print { display: none !important; }
+  .print-only { display: block !important; }
+  .hide-for-print { display: none !important; }
+  .show-for-print { display: inherit !important; } }
+table { background: white; margin-bottom: 1.25em; border: solid 1px #dddddd; }
+table thead, table tfoot { background: whitesmoke; font-weight: bold; }
+table thead tr th, table thead tr td, table tfoot tr th, table tfoot tr td { padding: 0.5em 0.625em 0.625em; font-size: inherit; color: #222222; text-align: left; }
+table tr th, table tr td { padding: 0.5625em 0.625em; font-size: inherit; color: #222222; }
+table tr.even, table tr.alt, table tr:nth-of-type(even) { background: #f9f9f9; }
+table thead tr th, table tfoot tr th, table tbody tr td, table tr td, table tfoot tr td { display: table-cell; line-height: 1.6; }
+.clearfix:before, .clearfix:after, .float-group:before, .float-group:after { content: " "; display: table; }
+.clearfix:after, .float-group:after { clear: both; }
+*:not(pre) > code { font-size: 0.9375em; padding: 1px 3px 0; white-space: nowrap; background-color: #f2f2f2; border: 1px solid #cccccc; -webkit-border-radius: 4px; border-radius: 4px; text-shadow: none; }
+pre, pre > code { line-height: 1.4; color: inherit; font-family: Consolas, "Liberation Mono", Courier, monospace; font-weight: normal; }
+kbd.keyseq { color: #555555; }
+kbd:not(.keyseq) { display: inline-block; color: #222222; font-size: 0.75em; line-height: 1.4; background-color: #F7F7F7; border: 1px solid #ccc; -webkit-border-radius: 3px; border-radius: 3px; -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px white inset; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px white inset; margin: -0.15em 0.15em 0 0.15em; padding: 0.2em 0.6em 0.2em 0.5em; vertical-align: middle; white-space: nowrap; }
+kbd kbd:first-child { margin-left: 0; }
+kbd kbd:last-child { margin-right: 0; }
+.menuseq, .menu { color: #090909; }
+p a > code:hover { color: #561309; }
+#header, #content, #footnotes, #footer { width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
+#header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { content: " "; display: table; }
+#header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
+#header { margin-bottom: 2.5em; }
+#header > h1 { color: black; font-weight: normal; border-bottom: 1px solid #dddddd; margin-bottom: -28px; padding-bottom: 32px; }
+#header span { color: #6f6f6f; }
+#header #revnumber { text-transform: capitalize; }
+#header br { display: none; }
+#header br + span { padding-left: 3px; }
+#header br + span:before { content: "\2013 \0020"; }
+#header br + span.author { padding-left: 0; }
+#header br + span.author:before { content: ", "; }
+#toc { border-bottom: 3px double #ebebeb; padding-bottom: 1.25em; }
+#toc > ul { margin-left: 0.25em; }
+#toc ul.sectlevel0 > li > a { font-style: italic; }
+#toc ul.sectlevel0 ul.sectlevel1 { margin-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
+#toc ul { list-style-type: none; }
+#toctitle { color: #7a2518; }
+@media only screen and (min-width: 1280px) { body.toc2 { padding-left: 20em; }
+  #toc.toc2 { position: fixed; width: 20em; left: 0; top: 0; border-right: 1px solid #ebebeb; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
+  #toc.toc2 #toctitle { margin-top: 0; }
+  #toc.toc2 > ul { font-size: .95em; }
+  #toc.toc2 ul ul { margin-left: 0; padding-left: 1.25em; }
+  #toc.toc2 ul.sectlevel0 ul.sectlevel1 { padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
+  body.toc2.toc-right { padding-left: 0; padding-right: 20em; }
+  body.toc2.toc-right #toc.toc2 { border-right: 0; border-left: 1px solid #ebebeb; left: auto; right: 0; } }
+#content #toc { border-style: solid; border-width: 1px; border-color: #d9d9d9; margin-bottom: 1.25em; padding: 1.25em; background: #f2f2f2; border-width: 0; -webkit-border-radius: 4px; border-radius: 4px; }
+#content #toc > :first-child { margin-top: 0; }
+#content #toc > :last-child { margin-bottom: 0; }
+#content #toc a { text-decoration: none; }
+#content #toctitle { font-weight: bold; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-size: 1em; padding-left: 0.125em; }
+#footer { max-width: 100%; background-color: #222222; padding: 1.25em; }
+#footer-text { color: #dddddd; line-height: 1.44; }
+.sect1 { padding-bottom: 1.25em; }
+.sect1 + .sect1 { border-top: 3px double #ebebeb; }
+#content h1 > a.anchor, h2 > a.anchor, h3 > a.anchor, #toctitle > a.anchor, .sidebarblock > .content > .title > a.anchor, h4 > a.anchor, h5 > a.anchor, h6 > a.anchor { position: absolute; width: 1em; margin-left: -1em; display: block; text-decoration: none; visibility: hidden; text-align: center; font-weight: normal; }
+#content h1 > a.anchor:before, h2 > a.anchor:before, h3 > a.anchor:before, #toctitle > a.anchor:before, .sidebarblock > .content > .title > a.anchor:before, h4 > a.anchor:before, h5 > a.anchor:before, h6 > a.anchor:before { content: '\00A7'; font-size: .85em; vertical-align: text-top; display: block; margin-top: 0.05em; }
+#content h1:hover > a.anchor, #content h1 > a.anchor:hover, h2:hover > a.anchor, h2 > a.anchor:hover, h3:hover > a.anchor, #toctitle:hover > a.anchor, .sidebarblock > .content > .title:hover > a.anchor, h3 > a.anchor:hover, #toctitle > a.anchor:hover, .sidebarblock > .content > .title > a.anchor:hover, h4:hover > a.anchor, h4 > a.anchor:hover, h5:hover > a.anchor, h5 > a.anchor:hover, h6:hover > a.anchor, h6 > a.anchor:hover { visibility: visible; }
+#content h1 > a.link, h2 > a.link, h3 > a.link, #toctitle > a.link, .sidebarblock > .content > .title > a.link, h4 > a.link, h5 > a.link, h6 > a.link { color: #ba3925; text-decoration: none; }
+#content h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, #toctitle > a.link:hover, .sidebarblock > .content > .title > a.link:hover, h4 > a.link:hover, h5 > a.link:hover, h6 > a.link:hover { color: #a53221; }
+.imageblock, .literalblock, .listingblock, .verseblock, .videoblock { margin-bottom: 1.25em; }
+.admonitionblock td.content > .title, .exampleblock > .title, .imageblock > .title, .videoblock > .title, .listingblock > .title, .literalblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, .sidebarblock > .title, .tableblock > .title, .verseblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title { text-align: left; font-weight: bold; }
+.tableblock > caption { text-align: left; font-weight: bold; white-space: nowrap; overflow: visible; max-width: 0; }
+table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-size: inherit; }
+.admonitionblock > table { border: 0; background: none; width: 100%; }
+.admonitionblock > table td.icon { text-align: center; width: 80px; }
+.admonitionblock > table td.icon img { max-width: none; }
+.admonitionblock > table td.icon .title { font-weight: bold; text-transform: uppercase; }
+.admonitionblock > table td.content { padding-left: 1.125em; padding-right: 1.25em; border-left: 1px solid #dddddd; color: #6f6f6f; }
+.admonitionblock > table td.content > :last-child > :last-child { margin-bottom: 0; }
+.exampleblock > .content { border-style: solid; border-width: 1px; border-color: #e6e6e6; margin-bottom: 1.25em; padding: 1.25em; background: white; -webkit-border-radius: 4px; border-radius: 4px; }
+.exampleblock > .content > :first-child { margin-top: 0; }
+.exampleblock > .content > :last-child { margin-bottom: 0; }
+.exampleblock > .content h1, .exampleblock > .content h2, .exampleblock > .content h3, .exampleblock > .content #toctitle, .sidebarblock.exampleblock > .content > .title, .exampleblock > .content h4, .exampleblock > .content h5, .exampleblock > .content h6, .exampleblock > .content p { color: #333333; }
+.exampleblock > .content h1, .exampleblock > .content h2, .exampleblock > .content h3, .exampleblock > .content #toctitle, .sidebarblock.exampleblock > .content > .title, .exampleblock > .content h4, .exampleblock > .content h5, .exampleblock > .content h6 { line-height: 1; margin-bottom: 0.625em; }
+.exampleblock > .content h1.subheader, .exampleblock > .content h2.subheader, .exampleblock > .content h3.subheader, .exampleblock > .content .subheader#toctitle, .sidebarblock.exampleblock > .content > .subheader.title, .exampleblock > .content h4.subheader, .exampleblock > .content h5.subheader, .exampleblock > .content h6.subheader { line-height: 1.4; }
+.exampleblock.result > .content { -webkit-box-shadow: 0 1px 8px #d9d9d9; box-shadow: 0 1px 8px #d9d9d9; }
+.sidebarblock { border-style: solid; border-width: 1px; border-color: #d9d9d9; margin-bottom: 1.25em; padding: 1.25em; background: #f2f2f2; -webkit-border-radius: 4px; border-radius: 4px; }
+.sidebarblock > :first-child { margin-top: 0; }
+.sidebarblock > :last-child { margin-bottom: 0; }
+.sidebarblock h1, .sidebarblock h2, .sidebarblock h3, .sidebarblock #toctitle, .sidebarblock > .content > .title, .sidebarblock h4, .sidebarblock h5, .sidebarblock h6, .sidebarblock p { color: #333333; }
+.sidebarblock h1, .sidebarblock h2, .sidebarblock h3, .sidebarblock #toctitle, .sidebarblock > .content > .title, .sidebarblock h4, .sidebarblock h5, .sidebarblock h6 { line-height: 1; margin-bottom: 0.625em; }
+.sidebarblock h1.subheader, .sidebarblock h2.subheader, .sidebarblock h3.subheader, .sidebarblock .subheader#toctitle, .sidebarblock > .content > .subheader.title, .sidebarblock h4.subheader, .sidebarblock h5.subheader, .sidebarblock h6.subheader { line-height: 1.4; }
+.sidebarblock > .content > .title { color: #7a2518; margin-top: 0; line-height: 1.6; }
+.exampleblock > .content > :last-child > :last-child, .exampleblock > .content .olist > ol > li:last-child > :last-child, .exampleblock > .content .ulist > ul > li:last-child > :last-child, .exampleblock > .content .qlist > ol > li:last-child > :last-child, .sidebarblock > .content > :last-child > :last-child, .sidebarblock > .content .olist > ol > li:last-child > :last-child, .sidebarblock > .content .ulist > ul > li:last-child > :last-child, .sidebarblock > .content .qlist > ol > li:last-child > :last-child { margin-bottom: 0; }
+.literalblock > .content pre, .listingblock > .content pre { background: none; border-width: 1px 0; border-style: dotted; border-color: #bfbfbf; -webkit-border-radius: 4px; border-radius: 4px; padding: 0.75em 0.75em 0.5em 0.75em; word-wrap: break-word; }
+.literalblock > .content pre.nowrap, .listingblock > .content pre.nowrap { overflow-x: auto; white-space: pre; word-wrap: normal; }
+.literalblock > .content pre > code, .listingblock > .content pre > code { display: block; }
+@media only screen { .literalblock > .content pre, .listingblock > .content pre { font-size: 0.8em; } }
+@media only screen and (min-width: 768px) { .literalblock > .content pre, .listingblock > .content pre { font-size: 0.9em; } }
+@media only screen and (min-width: 1280px) { .literalblock > .content pre, .listingblock > .content pre { font-size: 1em; } }
+.listingblock > .content { position: relative; }
+.listingblock:hover code[class*=" language-"]:before { text-transform: uppercase; font-size: 0.9em; color: #999; position: absolute; top: 0.375em; right: 0.375em; }
+.listingblock:hover code.asciidoc:before { content: "asciidoc"; }
+.listingblock:hover code.clojure:before { content: "clojure"; }
+.listingblock:hover code.css:before { content: "css"; }
+.listingblock:hover code.groovy:before { content: "groovy"; }
+.listingblock:hover code.html:before { content: "html"; }
+.listingblock:hover code.java:before { content: "java"; }
+.listingblock:hover code.javascript:before { content: "javascript"; }
+.listingblock:hover code.python:before { content: "python"; }
+.listingblock:hover code.ruby:before { content: "ruby"; }
+.listingblock:hover code.scss:before { content: "scss"; }
+.listingblock:hover code.xml:before { content: "xml"; }
+.listingblock:hover code.yaml:before { content: "yaml"; }
+.listingblock.terminal pre .command:before { content: attr(data-prompt); padding-right: 0.5em; color: #999; }
+.listingblock.terminal pre .command:not([data-prompt]):before { content: '$'; }
+table.pyhltable { border: 0; margin-bottom: 0; }
+table.pyhltable td { vertical-align: top; padding-top: 0; padding-bottom: 0; }
+table.pyhltable td.code { padding-left: .75em; padding-right: 0; }
+.highlight.pygments .lineno, table.pyhltable td:not(.code) { color: #999; padding-left: 0; padding-right: .5em; border-right: 1px solid #dddddd; }
+.highlight.pygments .lineno { display: inline-block; margin-right: .25em; }
+table.pyhltable .linenodiv { background-color: transparent !important; padding-right: 0 !important; }
+.quoteblock { margin: 0 0 1.25em; padding: 0.5625em 1.25em 0 1.1875em; border-left: 1px solid #dddddd; }
+.quoteblock blockquote { margin: 0 0 1.25em 0; padding: 0 0 0.5625em 0; border: 0; }
+.quoteblock blockquote > .paragraph:last-child p { margin-bottom: 0; }
+.quoteblock .attribution { margin-top: -.25em; padding-bottom: 0.5625em; font-size: inherit; color: #555555; }
+.quoteblock .attribution br { display: none; }
+.quoteblock .attribution cite { display: block; margin-bottom: 0.625em; }
+table thead th, table tfoot th { font-weight: bold; }
+table.tableblock.grid-all { border-collapse: separate; border-spacing: 1px; -webkit-border-radius: 4px; border-radius: 4px; border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; }
+table.tableblock.frame-topbot, table.tableblock.frame-none { border-left: 0; border-right: 0; }
+table.tableblock.frame-sides, table.tableblock.frame-none { border-top: 0; border-bottom: 0; }
+table.tableblock td .paragraph:last-child p, table.tableblock td > p:last-child { margin-bottom: 0; }
+th.tableblock.halign-left, td.tableblock.halign-left { text-align: left; }
+th.tableblock.halign-right, td.tableblock.halign-right { text-align: right; }
+th.tableblock.halign-center, td.tableblock.halign-center { text-align: center; }
+th.tableblock.valign-top, td.tableblock.valign-top { vertical-align: top; }
+th.tableblock.valign-bottom, td.tableblock.valign-bottom { vertical-align: bottom; }
+th.tableblock.valign-middle, td.tableblock.valign-middle { vertical-align: middle; }
+p.tableblock.header { color: #222222; font-weight: bold; }
+td > div.verse { white-space: pre; }
+ol { margin-left: 1.75em; }
+ul li ol { margin-left: 1.5em; }
+dl dd { margin-left: 1.125em; }
+dl dd:last-child, dl dd:last-child > :last-child { margin-bottom: 0; }
+ol > li p, ul > li p, ul dd, ol dd, .olist .olist, .ulist .ulist, .ulist .olist, .olist .ulist { margin-bottom: 0.625em; }
+ul.unstyled, ol.unnumbered, ul.checklist, ul.none { list-style-type: none; }
+ul.unstyled, ol.unnumbered, ul.checklist { margin-left: 0.625em; }
+ul.checklist li > p:first-child > i[class^="icon-check"]:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child { margin-right: 0.25em; }
+ul.checklist li > p:first-child > input[type="checkbox"]:first-child { position: relative; top: 1px; }
+ul.inline { margin: 0 auto 0.625em auto; margin-left: -1.375em; margin-right: 0; padding: 0; list-style: none; overflow: hidden; }
+ul.inline > li { list-style: none; float: left; margin-left: 1.375em; display: block; }
+ul.inline > li > * { display: block; }
+.unstyled dl dt { font-weight: normal; font-style: normal; }
+ol.arabic { list-style-type: decimal; }
+ol.decimal { list-style-type: decimal-leading-zero; }
+ol.loweralpha { list-style-type: lower-alpha; }
+ol.upperalpha { list-style-type: upper-alpha; }
+ol.lowerroman { list-style-type: lower-roman; }
+ol.upperroman { list-style-type: upper-roman; }
+ol.lowergreek { list-style-type: lower-greek; }
+.hdlist > table, .colist > table { border: 0; background: none; }
+.hdlist > table > tbody > tr, .colist > table > tbody > tr { background: none; }
+td.hdlist1 { padding-right: .8em; font-weight: bold; }
+td.hdlist1, td.hdlist2 { vertical-align: top; }
+.literalblock + .colist, .listingblock + .colist { margin-top: -0.5em; }
+.colist > table tr > td:first-of-type { padding: 0 .8em; line-height: 1; }
+.colist > table tr > td:last-of-type { padding: 0.25em 0; }
+.qanda > ol > li > p > em:only-child { color: #00467f; }
+.thumb, .th { line-height: 0; display: inline-block; border: solid 4px white; -webkit-box-shadow: 0 0 0 1px #dddddd; box-shadow: 0 0 0 1px #dddddd; }
+.imageblock.left, .imageblock[style*="float: left"] { margin: 0.25em 0.625em 1.25em 0; }
+.imageblock.right, .imageblock[style*="float: right"] { margin: 0.25em 0 1.25em 0.625em; }
+.imageblock > .title { margin-bottom: 0; }
+.imageblock.thumb, .imageblock.th { border-width: 6px; }
+.imageblock.thumb > .title, .imageblock.th > .title { padding: 0 0.125em; }
+.image.left, .image.right { margin-top: 0.25em; margin-bottom: 0.25em; display: inline-block; line-height: 0; }
+.image.left { margin-right: 0.625em; }
+.image.right { margin-left: 0.625em; }
+a.image { text-decoration: none; }
+span.footnote, span.footnoteref { vertical-align: super; font-size: 0.875em; }
+span.footnote a, span.footnoteref a { text-decoration: none; }
+#footnotes { padding-top: 0.75em; padding-bottom: 0.75em; margin-bottom: 0.625em; }
+#footnotes hr { width: 20%; min-width: 6.25em; margin: -.25em 0 .75em 0; border-width: 1px 0 0 0; }
+#footnotes .footnote { padding: 0 0.375em; line-height: 1.3; font-size: 0.875em; margin-left: 1.2em; text-indent: -1.2em; margin-bottom: .2em; }
+#footnotes .footnote a:first-of-type { font-weight: bold; text-decoration: none; }
+#footnotes .footnote:last-of-type { margin-bottom: 0; }
+#content #footnotes { margin-top: -0.625em; margin-bottom: 0; padding: 0.75em 0; }
+.gist .file-data > table { border: none; background: #fff; width: 100%; margin-bottom: 0; }
+.gist .file-data > table td.line-data { width: 99%; }
+div.unbreakable { page-break-inside: avoid; }
+.big { font-size: larger; }
+.small { font-size: smaller; }
+.underline { text-decoration: underline; }
+.overline { text-decoration: overline; }
+.line-through { text-decoration: line-through; }
+.aqua { color: #00bfbf; }
+.aqua-background { background-color: #00fafa; }
+.black { color: black; }
+.black-background { background-color: black; }
+.blue { color: #0000bf; }
+.blue-background { background-color: #0000fa; }
+.fuchsia { color: #bf00bf; }
+.fuchsia-background { background-color: #fa00fa; }
+.gray { color: #606060; }
+.gray-background { background-color: #7d7d7d; }
+.green { color: #006000; }
+.green-background { background-color: #007d00; }
+.lime { color: #00bf00; }
+.lime-background { background-color: #00fa00; }
+.maroon { color: #600000; }
+.maroon-background { background-color: #7d0000; }
+.navy { color: #000060; }
+.navy-background { background-color: #00007d; }
+.olive { color: #606000; }
+.olive-background { background-color: #7d7d00; }
+.purple { color: #600060; }
+.purple-background { background-color: #7d007d; }
+.red { color: #bf0000; }
+.red-background { background-color: #fa0000; }
+.silver { color: #909090; }
+.silver-background { background-color: #bcbcbc; }
+.teal { color: #006060; }
+.teal-background { background-color: #007d7d; }
+.white { color: #bfbfbf; }
+.white-background { background-color: #fafafa; }
+.yellow { color: #bfbf00; }
+.yellow-background { background-color: #fafa00; }
+span.icon > [class^="icon-"], span.icon > [class*=" icon-"] { cursor: default; }
+.admonitionblock td.icon [class^="icon-"]:before { font-size: 2.5em; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); cursor: default; }
+.admonitionblock td.icon .icon-note:before { content: "\f05a"; color: #005498; color: #003f72; }
+.admonitionblock td.icon .icon-tip:before { content: "\f0eb"; text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8); color: #111; }
+.admonitionblock td.icon .icon-warning:before { content: "\f071"; color: #bf6900; }
+.admonitionblock td.icon .icon-caution:before { content: "\f06d"; color: #bf3400; }
+.admonitionblock td.icon .icon-important:before { content: "\f06a"; color: #bf0000; }
+.conum { display: inline-block; color: white !important; background-color: #222222; -webkit-border-radius: 100px; border-radius: 100px; text-align: center; width: 20px; height: 20px; font-size: 12px; font-weight: bold; line-height: 20px; font-family: Arial, sans-serif; font-style: normal; position: relative; top: -2px; letter-spacing: -1px; }
+.conum * { color: white !important; }
+.conum + b { display: none; }
+.conum:after { content: attr(data-value); }
+.conum:not([data-value]):empty { display: none; }
+.literalblock > .content > pre, .listingblock > .content > pre { -webkit-border-radius: 0; border-radius: 0; }
+
+</style>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/default.min.css">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</head>
+<body class="book">
+<div id="header">
+<h1>How to write a(n agent) plugin for RHQ and JBoss ON?</h1>
+<span id="author" class="author">Heiko W. Rupp</span><br>
+<span id="email" class="email"><a href="mailto:heiko.rupp@redhat.com">heiko.rupp@redhat.com</a></span><br>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_preface">Preface</a></li>
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_general_architecture_of_rhq">General architecture of RHQ</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_server_side_services">Server side services</a></li>
+<li><a href="#_agent_architecture">Agent architecture</a></li>
+<li><a href="#_central_functionality_inventory">Central functionality: Inventory</a></li>
+</ul>
+</li>
+<li><a href="#_example">Example</a></li>
+<li>
+<ul class="sectlevel1">
+<li><a href="#_the_scenario_revisited">The scenario revisited</a></li>
+<li><a href="#_what_do_we_need">What do we need ?</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#ref-pd-main">Plugin descriptor</a></li>
+<li><a href="#_discovery_component">Discovery component</a></li>
+<li><a href="#_plugin_component">Plugin component</a></li>
+</ul>
+</li>
+<li><a href="#_the_project_structure">The project structure</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_directory_layout">Directory layout</a></li>
+<li><a href="#_maven_pom">Maven pom</a></li>
+<li><a href="#_the_artifacts_of_our_plugin">The artifacts of our plugin</a></li>
+</ul>
+</li>
+<li><a href="#_ready_steady_go">Ready, steady, go &#8230;</a></li>
+<li><a href="#_what_do_we_have_now">What do we have now?</a></li>
+<li><a href="#_enhancing_the_plugin">Enhancing the plugin</a></li>
+<li><a href="#_changed_plugin_descriptor">Changed plugin descriptor</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_a_word_about_configuration_and_properties">A word about configuration and properties</a></li>
+<li><a href="#_change_in_discovery_components">Change in discovery components</a></li>
+<li><a href="#_change_in_plugin_components">Change in plugin components</a></li>
+</ul>
+</li>
+<li><a href="#_summary">Summary</a></li>
+</ul>
+</li>
+<li><a href="#_advanced_topics">Advanced topics</a></li>
+<li>
+<ul class="sectlevel1">
+<li><a href="#_preface_2">Preface</a></li>
+<li><a href="#_things_to_consider_when_writing_a_plugin">Things to consider when writing a plugin</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_decomposing_plugins">Decomposing Plugins</a></li>
+<li><a href="#_using_process_scans_for_discovery">Using Process scans for discovery</a></li>
+</ul>
+</li>
+<li><a href="#_discovery_component_revisited">Discovery component revisited</a></li>
+<li><a href="#_a_few_more_facets">A few more Facets</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_configurationfacet">ConfigurationFacet</a></li>
+<li><a href="#_operationfacet">OperationFacet</a></li>
+<li><a href="#_contentfacet">ContentFacet</a></li>
+<li><a href="#_events">Events</a></li>
+<li><a href="#_plugin_component_3">Plugin Component</a></li>
+<li><a href="#_event_poller">Event Poller</a></li>
+</ul>
+</li>
+<li><a href="#_creation_and_deletion_of_managed_resources">Creation and deletion of managed resources</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_plugin_descriptor_2">Plugin descriptor</a></li>
+<li><a href="#_and_the_code_for_creation">And the code for creation</a></li>
+<li><a href="#__and_deletion">&#8230; and deletion</a></li>
+</ul>
+</li>
+<li><a href="#_plugin_inheritance">Plugin inheritance</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_zip_less_plugins">Zip-less plugins</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_tools">Tools</a></li>
+<li>
+<ul class="sectlevel1">
+<li><a href="#_preface_3">Preface</a></li>
+<li><a href="#_plugin_generator">Plugin generator</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_sample_run">Sample run</a></li>
+</ul>
+</li>
+<li><a href="#_standalone_plugin_container">Standalone plugin container</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_sample_run_2">Sample run</a></li>
+<li><a href="#_getting_and_setting_the_plugin_configuration">Getting and setting the plugin configuration</a></li>
+<li><a href="#_command_history">Command history</a></li>
+<li><a href="#_finding_resources_by_criteria">Finding resources by criteria</a></li>
+<li><a href="#_recording_and_replaying_of_commands">Recording and replaying of commands</a></li>
+</ul>
+</li>
+<li><a href="#_plugin_verification">Plugin verification</a></li>
+<li><a href="#agent-plugin-plugin">Agent Plugin Plugin</a></li>
+</ul>
+</li>
+<li><a href="#_appendix">Appendix</a></li>
+<li>
+<ul class="sectlevel1">
+<li><a href="#_more_information_on_plugins">More information on Plugins</a></li>
+<li><a href="#_about_rhq">About RHQ</a></li>
+<li><a href="#_about_the_author">About the author</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_preface">Preface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document builds on a series of blog postings I made on my blog at
+<a href="http://pilhuhn.blogspot.com/search/label/RHQ">http://pilhuhn.blogspot.com/search/label/RHQ</a>.
+This blog also features other JBoss ON, RHQ and plugin related content that is
+not contained here. While this document
+also applies to JBoss Operations Network (JBoss ON), I usually will just talk
+about RHQ.</p>
+</div>
+<div class="paragraph">
+<p>Please contact me or my colleagues if you have questions or suggestions.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+This document is a best effort attempt into describing the process of
+writing agent plugins for RHQ.
+This document may contain errors or omissions. The author assumes no liability.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-note" title="Note"></i>
+</td>
+<td class="content">
+This document is released under a Creative Commons 3.0  BY-SA license.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Of course comments, bug fixes and additions are welcome.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RHQ Project is the foundation of a powerful open source system management suite.
+It builds the framework for other management applications like JBoss ON.
+While there is a core set of functionality, the capabilities to manage individual
+kinds of target resources is not hard coded into RHQ, but can (or must) be provided
+by <em>plugins</em>.</p>
+</div>
+<div class="paragraph">
+<p>This paper will try to show how to write your own plugins for RHQ. This could be
+"bare metal" plugins to e.g. determine free disk space or process
+availability. It could also be a plugin that determines the number and volume of
+orders flowing through your web shop.</p>
+</div>
+<div class="paragraph">
+<p>As an example scenario the plugin will try to reach a http server, see if the
+base URL is available and return the status code + the time it took to reach it.
+We will first write a simple version and enhance it afterwards. At the end
+I&#8217;ll be talking about some additional topics around plugin development. But
+before we come to this, lets have a look at the environment.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_general_architecture_of_rhq">General architecture of RHQ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before we go into detailed plugin writing, I first want to show the general
+architecture of RHQ and its plugin system.</p>
+</div>
+<div class="paragraph">
+<p>RHQ follows a hub and spoke approach: A central server (or cluster of servers)
+processes data coming in from agents. The data is stored in a database connected
+to the server(s). Users and administrators can look at the data and trigger
+operations
+on the server. This can happen through a web-based GUI, a command line interface
+or via the REST-api.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/rhq_arch.png" alt="RHQ Architecture">
+</div>
+</div>
+<div class="paragraph">
+<p>Agents do not have a fixed (read as in compile-time) functionality, but can be
+extended through plugins <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span> which we will see below. Usually there is one
+agent running per machine that has resources to manage.</p>
+</div>
+<div class="sect2">
+<h3 id="_server_side_services">Server side services</h3>
+<div class="paragraph">
+<p>The server hosts a number of services like:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It has a view on the complete Inventory</p>
+</li>
+<li>
+<p>It processes incoming measurement data</p>
+</li>
+<li>
+<p>It triggers alerts to be sent</p>
+</li>
+<li>
+<p>It triggers operations on managed resources</p>
+</li>
+<li>
+<p>It hosts the graphical user interface</p>
+</li>
+<li>
+<p>It hosts the user management</p>
+</li>
+<li>
+<p>&#8230;</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Some of those services are reflected in the agent like inventory syncing,
+gathering of measurement data or running operations on a managed resource, while
+alert processing or hosting of the GUI is purely on the server.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-note" title="Note"></i>
+</td>
+<td class="content">
+An RHQ server never directly talks to a managed resource. Only agents
+(or better: their plugins) talk to managed resources.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_agent_architecture">Agent architecture</h3>
+<div class="paragraph">
+<p>The agent is sort of a container that hosts some common functionality like the
+communication interface with the server, logging, starting and stopping of
+plugins, reading configuration files or spooling data in case the server is not
+reachable. It is also handling of the command line and interactive command
+prompt.</p>
+</div>
+<div class="paragraph">
+<p>In addition to this, it hosts the plugin container, who hosts the actual
+plugins. When you write a plugin, you talk to the plugin container.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/agent_arch.png" alt="Agent architecture">
+</div>
+</div>
+<div class="paragraph">
+<p>The agent also hosts its it is local view of the inventory (see next section)
+for the resources it knows.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_central_functionality_inventory">Central functionality: Inventory</h3>
+<div class="paragraph">
+<p>The central piece of functionality in RHQ is the inventory. Each resource that
+you want to manage or monitor must be present in that inventory. RHQ has
+mechanisms to auto detect and also manually add resources. We&#8217;ll come back to
+that later when we are talking about implementing plugins.
+Each <code>org.rhq.core.domain.resource.Resource</code> has a certain
+<code>org.rhq.core.domain.resource.ResourceCategory</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Platform: This is basically a host where things run on</p>
+</li>
+<li>
+<p>Server: Things like database server, JbossAS instance or the RHQ agent</p>
+</li>
+<li>
+<p>Service: (Fine grained) Services offered by a server</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The ResourceCategory is sort of hierarchic as you can see on the next image:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/resource_category.png" alt="ResourceCategory">
+</div>
+</div>
+<div class="paragraph">
+<p>A platform hosts servers, a server can host other servers and services and a
+service can host other services. In theory it is also possible that a platform
+is hosting other platforms.
+As an example: you have a Red Hat Linux platform, which hosts the RHQ Agent and
+JBossAS as a server. This AS it self is hosting a Tomcat server. Both JBossAS
+and Tomcat are hosting services like JMS or Connectors.
+So at the end this will result in a tree of resources with the Linux platform as
+its root.
+In addition to the category each Resource also is of a certain
+<code>org.rhq.core.domain.resource.ResourceType</code>. For a platform this might e.g.
+"Max OS X", "Red Hat Linux", "Debian Linux" etc. Or the JBossAS and
+Tomcat from above are both of category Server, but have different ResourceType.</p>
+</div>
+</div>
+</div>
+</div>
+<h1 id="_example" class="sect0">Example</h1>
+<div class="paragraph">
+<p>We are now developing the example plugin step by step. First a simple version
+to get going and will then enhance it. The full source code of both is available
+in a Git Repository at {doc.git.home}/source</p>
+</div>
+<div class="sect1">
+<h2 id="_the_scenario_revisited">The scenario revisited</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Our plugin should be able to connect to a http server, issue a GET or HEAD
+request on the base url (e.g. <a href="http://localhost/)">http://localhost/)</a> and return the http return code
+as trait and the time it took as numeric data (see below).</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/scenario_overview.png" alt="Scenario Overview">
+</div>
+</div>
+<div class="paragraph">
+<p>To make things easier for the purpose of this first implementation, we will have
+the agent running on the machine the RHQ server lives on and we will just try to
+get data from the RHQ server&#8217;s http connector at port 7080 (the default port).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_do_we_need">What do we need ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to write our plugin we basically need three things:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A plugin descriptor. This contains metadata about the plugin: which metrics
+should be collected, what operations does it support etc.</p>
+</li>
+<li>
+<p>A discovery component. This part discovers the actual resource(s) and delivers
+them to the Inventory.</p>
+</li>
+<li>
+<p>A plugin component. This component executes operations and gathers the
+measurement data etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So lets have a look into those three parts.</p>
+</div>
+<div class="sect2">
+<h3 id="ref-pd-main">Plugin descriptor</h3>
+<div class="paragraph">
+<p>The plugin descriptor is described by an XML Schema that you can find in the
+<a href="https://github.com/rhq_project/rhq/modules/core/client-api/src/main/resources/rhq-plugin.xsd">git repository</a>
+under <code>modules/core/client-api/src/main/resources/rhq-plugin.xsd</code>. The basic structure is as follows:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/plugin_descriptor_structure.png" alt="Structure of the plugin descriptor">
+</div>
+</div>
+<div class="paragraph">
+<p>The descriptor consists of a few sections. First you can express dependencies to
+other plugins. This is allows reuse of existing plugins and is useful when you
+e.g. want to write a plugin that itself needs the JMX plugin, so that it can do
+its work (see also "Decomposing Plugins" below).</p>
+</div>
+<div class="paragraph">
+<p>The next are a row of platform/server/service sections. Each of those can have
+the same (XML-)content as the platform that is shown as an example - they are
+all of the same (XML-) data type (as a platform/server/service) as each is a
+kind of resource type, as you already know from the first part.
+Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;service name="CheckHttp"&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+  &lt;metric property="responseTime"
+          description="How long did it take to connect"
+          displayType="Summary"
+          displayName="Time to get the response"
+          units="ms" /&gt;
+&lt;/service&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The name of a <code>&lt;service&gt;</code> and the other ResourceTypes (platform, server) must
+be unique for a plugin. So it is not allowed to have two services named
+"CheckHttp" within our example plugin, but you could write a Tomcat5 and a
+separate Tomcat6 plugin that both have a service with the name "connector".</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For the start we are especially interested in one of the sub elements: <code>metric</code>
+for our example plugin, so I will describe this here in a little more detail.
+For all other tags refer to the XML Schema that has a lot of comments.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_metric_element">The "Metric" element</h4>
+<div class="paragraph">
+<p>This is a simple element with a bunch of attributes and no child tags. You have
+already seen an example above.
+Attributes of it are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>property: name of this metric. Can be obtained in the code via <code>getName()</code></p>
+</li>
+<li>
+<p>description: A human readable description of the metric</p>
+</li>
+<li>
+<p>displayName: The name that gets displayed</p>
+</li>
+<li>
+<p>dataType: Type of metric (numeric / trait /&#8230;)</p>
+</li>
+<li>
+<p>units: The measurement units for numerical dataType</p>
+</li>
+<li>
+<p>displayType: if set to "summary", the metric will show at the indicator
+charts and collected by default</p>
+</li>
+<li>
+<p>defaultOn: Shall this metric collected by default</p>
+</li>
+<li>
+<p>measurementType: what characteristics do the numerical values have (trends up,
+trends down, dynamic). The system will for trends* metrics, automatically create
+additional per minute metrics, which usually make more sense than the
+raw data (take e.g. number of http requsts served. 1.3 million does not really
+convey anything, but 6000 per minute does).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For the sample plugin we will use a metric with numerical <code>dataType</code> for the
+response time and a <code>dataType</code> of trait for the Status code. Traits are meant to
+be data values that only rarely change like OS version, IP Address of an
+ethernet interface or the hostname. RHQ is intelligent enough to only store
+changed traits to conserve space.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_discovery_component">Discovery component</h3>
+<div class="paragraph">
+<p>The discovery component will be called by the <code>InventoryManager</code> in the agent to
+discover resources. This can be done by a process table scan (e.g. for the
+Postgres plugin) or by any other means (if your plugin wants to look for
+JMX-based resources, then it can just query the MbeanServer. Well, actually
+there is a JMX-Plugin that can do that for you in clever ways).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-important" title="Important"></i>
+</td>
+<td class="content">
+The most important thing here is that the Discovery component must <strong>return the
+same unique key each time for the same resource</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The DiscoveryComponent needs to implement
+<code>org.rhq.core.pluginapi.inventory.ResourceDiscoveryComponent</code> and you need to
+implement <code>discoverResources()</code>.
+The usual code block that you will see for <code>discoverResources()</code> is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">public Set discoverResources(ResourceDiscoveryContext context) throws Exception { <i class="conum" data-value="1"></i><b>(1)</b>
+    Set&lt;DiscoveredResourceDetails&gt; result =
+        new HashSet&lt;DiscoveredResourceDetails&gt;();
+    for ( ... ) {
+     ...
+     DiscoveredResourceDetails detail = new DiscoveredResourceDetails(
+       context.getResourceType(), <i class="conum" data-value="2"></i><b>(2)</b>
+       uniqueResourceKey,
+       resourceName,
+       resourceVersion,
+       description,
+       configuration, // can be null if no configuration
+       processInfo);  // can be null for no process scan
+     result.add(detail);
+    }
+    return result;
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The context passed in gives you a lot of information, that you can use
+to discover the resource and create a <code>DiscoveredResourceDetails</code> object per
+discovered resource.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Always use the type from the passed context in the details object.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_plugin_component">Plugin component</h3>
+<div class="paragraph">
+<p>The plugin component is the part of the plugin that does the work after the
+discovery has finished.
+For each of the "basic functions" in the plugin descriptor, it needs to
+implement an appropriate <em>Facet</em>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&lt;metric&gt;</code>: MeasurementFacet</p>
+</li>
+<li>
+<p><code>&lt;operation&gt;</code>: OperationFacet</p>
+</li>
+<li>
+<p><code>&lt;resource-configuration&gt;</code>:  ConfigurationFacet</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each Facet has its own methods to implement. In the case of the
+<code>MeasurementFacet</code> this is e.g. <code>getValues(MeasurementReport report, Set
+metrics)</code>. The report passed in is where you add your results. The <code>metrics</code>
+parameter is a list of metrics for which data should be gathered. This can be
+all of your defined <code>&lt;metric&gt;</code> elements at once or only a few of
+them - this depends
+on the schedules the user configured in the GUI.
+You will find more information about other factes below.
+Remember: for the start we just have a very simple version of the plugin. We
+will enhance it below.
+First let&#8217;s talk about the project structure in the file system.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_project_structure">The project structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As RHQ is publishing maven artifacts for files that you will need during this
+example, we can directly use them and do not need to check out RHQ sources
+<a href="https://github.com/rhq-project/rhq">its git repository</a>
+to proceed (which may still be a good idea anyway).</p>
+</div>
+<div class="paragraph">
+<p>To start just create a folder for your project and proceed.</p>
+</div>
+<div class="sect2">
+<h3 id="_directory_layout">Directory layout</h3>
+<div class="paragraph">
+<p>Create a directory structure like the following:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/directory_layout.png" alt="Directory structure">
+</div>
+</div>
+<div class="paragraph">
+<p>Add <code>httptest/src/main/java</code> to the build path in your IDE and off you go.
+The classes within <code>org.rhq.plugins.httptest</code> form the plugin discovery
+component and plugin component and will be described below.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maven_pom">Maven pom</h3>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The source code is set up for RHQ Version 4.10.0. If you want to
+ use a different version of RHQ, you need to adjust the POM files.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>RHQ is a mavenized project, thus we need to supply a pom file. Easiest is to
+just grab another pom, copy it over to the root of the plugin subtree and change
+at least the following entries to match your local conventions.</p>
+</div>
+<div class="listingblock">
+<div class="title">Excerpt from pom.xml</div>
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;groupId&gt;org.acme&lt;/groupId&gt;
+&lt;artifactId&gt;rhq-httptest-plugin&lt;/artifactId&gt;
+&lt;version&gt;1.0&lt;/version&gt;
+&lt;name&gt;RHQ HttpTest Plugin&lt;/name&gt;
+&lt;description&gt;A plugin to monitor http servers&lt;/description&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In addition you also need to pull in a few dependencies</p>
+</div>
+<div class="paragraph">
+<p>The full pom of our example can be seen in <code>source/v1/pom.xml</code> - this also references
+a parent pom(in source/pom.xml), which provides the dependencies.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_artifacts_of_our_plugin">The artifacts of our plugin</h3>
+<div class="paragraph">
+<p>We will now look at the individual three artifacts that make up a plugin. The
+directory tree above shows where they are located.</p>
+</div>
+<div class="sect3">
+<h4 id="_plugin_discovery_component">Plugin discovery component</h4>
+<div class="paragraph">
+<p>First we start with discovering our server. This is relatively simple and
+directly follows the description in the previous part.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">public class HttpDiscoveryComponent implements ResourceDiscoveryComponent
+{
+  public Set discoverResources(ResourceDiscoveryContext context) throws
+       InvalidPluginConfigurationException, Exception
+  {
+    Set&lt;DiscoveredResourceDetails&gt; result =
+      new HashSet&lt;DiscoveredResourceDetails&gt;();
+
+    String key = "http://localhost:7080/"; // RHQ server
+    String name = key;
+    String description = "Http server at " + key;
+    Configuration configuration = null;
+    ResourceType resourceType = context.getResourceType();
+    DiscoveredResourceDetails detail = new DiscoveredResourceDetails(
+           resourceType,
+           key,
+           name,
+           null,
+           description,
+           configuration,
+           null );
+    result.add(detail);
+    return result;
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again it is extremely important that the key is/stays the same for each
+discovery performed!</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_plugin_component_2">Plugin component</h4>
+<div class="paragraph">
+<p>So the next part is the plugin component to do the work:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">public class HttpComponent implements ResourceComponent, MeasurementFacet {
+  URL url;       // remote server url
+  long time;     // response time from last collection
+  String status; // Status code from last collection</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As we want to monitor stuff, we need to implement the <code>MeasurementFacet</code> with
+the <code>getValues()</code> method (see below).
+But first we implement two of the methods from <code>ResourceComponent</code>. The first
+returns the availability of the remote server. We check if the status is <code>null</code>
+or 500 and return DOWN, otherwise UP.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">  public AvailabilityType getAvailability() {
+    if (status == null || status.startsWith("5")) {
+      return AvailabilityType.DOWN;
+    }
+    return AvailabilityType.UP;
+  }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>One needs to be careful here, as the discovery will not happen as long as this
+method is returning DOWN. So we provide a valid start value in the <code>start()</code>
+method from the <code>ResourceComponent</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">      public void start(ResourceContext context) throws
+         InvalidPluginConfigurationException, Exception
+      {
+        url = new URL("http://localhost:7080/");
+        // Provide an initial status,
+        //  so getAvailability() returns UP
+        status = "200";
+      }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Analogous to <code>start()</code> there is a <code>stop()</code> method, that can be used to clean up
+resources, which we leave empty and don&#8217;t show it here.</p>
+</div>
+<div class="paragraph">
+<p>This leads us to <code>getValues()</code> from the MeasurementFacet:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">      public void getValues(MeasurementReport report,
+           Set&lt;MeasurementScheduleRequest&gt; metrics) throws Exception
+      {
+        getData();
+        // Loop over the incoming requests and
+        // fill in the requested data
+        for (MeasurementScheduleRequest request : metrics) {
+          if (request.getName().equals("responseTime")) {
+            report.addData(new MeasurementDataNumeric( request, new Double(time)));
+          }
+          else if (request.getName().equals("status")) {
+            report.addData(new MeasurementDataTrait (request, status));
+          }
+        }
+      }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We get data from the remote and then loop over the incoming request to see which
+metric is wanted and fill it in. Depending on the type we need to wrap it into
+the correct <code>MeasurementData*</code> class.
+This leaves the implementation of <code>getData()</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">      private void getData()
+      {
+        HttpURLConnection con = null;
+        int code = 0;
+        try {
+          con = (HttpURLConnection) url.openConnection();
+          con.setConnectTimeout(1000);
+          long now = System.currentTimeMillis();
+          con.connect();
+          code = con.getResponseCode();
+          long t2 = System.currentTimeMillis();
+          time = t2 - now;
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        if (con != null) {
+          con.disconnect();
+         }
+         status = String.valueOf(code);
+      }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again this is nothing fancy. Just open a URL connection, take the time it takes
+to connect, get the status code and we are done. Of course, this could be
+optimized, but for this article I wanted to use a simple solution.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_plugin_descriptor">Plugin descriptor</h4>
+<div class="paragraph">
+<p>The plugin descriptor is where everything is glued together. First we start off
+with some "boiler plate" code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;plugin name="HttpTest"
+   displayName="HttpTest plugin"   <i class="conum" data-value="1"></i><b>(1)</b>
+   package="org.rhq.plugins.httptest" <i class="conum" data-value="2"></i><b>(2)</b>
+   version="2.0"  <i class="conum" data-value="3"></i><b>(3)</b>
+   description="Monitoring of http servers"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns="urn:xmlns:rhq-plugin"
+   xmlns:c="urn:xmlns:rhq-configuration"&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is the name of the plugin that is shown in the UI</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The package attribute predefines the Java package for Java class names that
+appear later in the descriptor.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The version of the plugin</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">  &lt;server name="HttpServer"
+        discovery="HttpDiscoveryComponent"
+        class="HttpComponent"
+        description="Http Server"&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We define our plugin as a Server. From the intuition it could be a Service, but
+Services can&#8217;t just live on their own so we choose a server here
+<span class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnote_2" title="View footnote.">2</a>]</span>.
+The attribute class denotes the plugin component and discovery the discovery
+component. If you have specified the package above, you can just use the class
+name without prefix.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">  &lt;metric property="responseTime"
+          displayName="Response Time"
+          measurementType="dynamic"
+          units="milliseconds"
+          displayType="summary"/&gt;
+
+  &lt;metric property="status"
+          displayName="Status Code"
+          dataType="trait"
+          displayType="summary"/&gt;
+ &lt;/server&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now the two metrics. With all the knowledge you have now, they are nothing
+special anymore.
+Again, <code>responseTime</code> is modeled as numerical data, while the status is modeled
+as trait. This could have been done differently, but is done here for
+educational purposes :-)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ready_steady_go">Ready, steady, go &#8230;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To compile the plugin, go to the root of the plugin tree and do mvn -Pdev
+install
+The dev mode allows maven to automatically deploy the plugin to a server
+instance as described on the Advanced Built Notes page on the RHQ-Wiki.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-note" title="Note"></i>
+</td>
+<td class="content">
+In the provided build I make use of the new rhq-agent-plugin plugin for
+maven, that is <a href="#agent-plugin-plugin">described later</a> in details. This plugin takes care of some
+plugin validation and also deploys the plugin to the RHQ server.
+To be able to deploy to the dev-container,
+you need to set the property <code>&lt;dev.container&gt;</code> in the root pom.xml of this tutorial
+to point to your local dev container.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When the server is running or starting up, you will see a line like this in the
+server log:</p>
+</div>
+<div class="literalblock">
+<div class="title">Output in server log when deploying the plugin</div>
+<div class="content">
+<pre>14:23:31,558 INFO  [ProductPluginDeployer] Discovered agent plugin [HttpTest]
+14:23:31,574 INFO  [ProductPluginDeployer] Deploying [1] new or updated agent plugins: [HttpTest]
+14:23:31,665 INFO  [ResourceMetadataManagerBean] Updating resource type [HttpTest:HttpServer(id=0)]...
+14:23:31,667 INFO  [ResourceMetadataManagerBean] Persisting new ResourceType [HttpTest:HttpServer(id=0)]...
+14:23:31,791 INFO  [ProductPluginDeployer] Plugin metadata updates are complete for [1] plugins: [HttpTest]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The next step is to make the plugin available to the agent. Remember that the
+agent is usually pulling plugins from the server when it is starting up. So if
+you have not yet started the agent, there is nothing to do for you. If the agent
+is already started, you can issue <code>plugins update</code> at the command prompt to
+update them to the latest versions of the server.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-note" title="Note"></i>
+</td>
+<td class="content">
+The server does not push updated plugins to agents. You need to actively trigger
+the update. Either via command prompt of the agent or via operation in the UI.
+</td>
+</tr>
+</table>
+</div>
+<div class="literalblock">
+<div class="title">Triggering a plugin update on the Agent.</div>
+<div class="content">
+<pre>snert$ bin/rhq-agent.sh
+Listening for transport dt_socket at address: 8788
+RHQ 4.5.0-SNAPSHOT [963a082] (Tue Aug 21 09:57:02 EDT 2012)
+&gt; plugins update
+The plugin container has been stopped.
+Updating plugins to their latest versions.
+The plugin [HttpTest] has been updated at [rhq-httptest-plugin-4.5.0-SNAPSHOT.jar].
+Completed updating the plugins to their latest versions.
+The plugin container has been started.
+&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you now log into the GUI at <a href="http://localhost:7080/">http://localhost:7080/</a> and go to
+<span class="menuseq"><span class="menu">Inventory</span>&#160;&#9656; <span class="menuitem">Discovery Queue</span></span> you import the new server into Inventory.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/discovery_queue.png" alt="Discovery Queue">
+</div>
+</div>
+<div class="paragraph">
+<p>Next go to the resource browser, click on <em>Servers</em> and you can see the
+server <em>discovered</em> by our plugin:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/inventory_servers.png" alt="Servers in Inventory">
+</div>
+</div>
+<div class="paragraph">
+<p>Clicking on the server name (the link) leads you to the details page for the
+resource. Clicking on Monitoring&#8594;Graphs brings you to the graphical metric
+display, where (after some time) you can see the response time values:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/metrics_from_plugin.png" alt="Metrics display">
+</div>
+</div>
+<div class="paragraph">
+<p>When you click on the Tables subtab, you can see the response time data for the
+server in a tabular way,
+while the trait for the status code can be found on the Traits subtab.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_do_we_have_now">What do we have now?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Congratulations, you just wrote your first RHQ plugin, that can also be used in
+JBoss ON. Writing a plugin consists of three parts: Discovery, Plugin
+Component and plugin descriptor. The agent with its plugin container is
+providing you with all the infrastructure to talk to the server, scheduling of
+metric gathering, scheduling of discovery etc. This means that you can fully
+concentrate on the business code of your plugin. RHQ just does the rest.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enhancing_the_plugin">Enhancing the plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We have just built our first RHQ plugin. This was working great, but hard coding
+the target URL is not really elegant. I will now show you how to make the target
+URLs configurable from the GUI.
+To do this we need to reshuffle things a little: We will have a generic Server
+<em>HttpCheck</em> that servers as parent for the individual
+http-servers that we want to monitor. Those will live as Services under that
+Server. In the Server inventory we will add the possibility to manually add new
+http servers on the go.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-note" title="Note"></i>
+</td>
+<td class="content">
+Before you continue, go to <span class="menu">Administration</span> and then to the Agent plugins
+section and remove the old plugin.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>INFO: The source code of this enhanced plugin is in sources/v2</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/manual_add.png" alt="RHQ Architecture">
+</div>
+</div>
+<div class="paragraph">
+<p>As you may have already guessed, most of those changes are done in the plugin descriptor.
+We also need some small code changes, but those are mostly to separate the
+concerns of the various files. Lets start with the changed plugin descriptor.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_changed_plugin_descriptor">Changed plugin descriptor</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The boilerplate code is the same as before and will thus not be shown again.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;server name="HttpCheck"
+    description="Httpserver pinging"
+    discovery="HttpDiscoveryComponent"
+    class="HttpComponent"&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I have changed the name of the Server to HttpCheck, as this is nicer in the GUI.
+Now the interesting part starts:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">  &lt;service name="HttpServer"
+       discovery="HttpServiceDiscoveryComponent"
+       class="HttpServiceComponent"
+       description="One remote Http Server"
+       supportsManualAdd="true"&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here we introduce a Service as child of the above Server. It has its own Plugin
+Component and Discovery classes (the name of the classes reflect that they
+belong to this Service). Technically they could have gone into the existing
+classes, but this way it is more obvious who does what. The attribute
+<em>supportsManualAdd</em> tells RHQ that those HttpServer Services can be added by the
+operator in the GUI - just what we want.</p>
+</div>
+<div class="listingblock">
+<div class="title">Plugin configuration to pass in the target URL</div>
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">    &lt;plugin-configuration&gt;
+       &lt;c:simple-property name="url" type="string" required="true" /&gt;
+    &lt;/plugin-configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The plugin-configuration tells RHQ that this service can be configured with one
+simple property, the URL of the remote, which is required. I&#8217;ll talk a bit
+more about properties in a minute.
+Last but not least, we have moved the two metrics into the service tag (so I
+don&#8217;t show them in detail again:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">        &lt;metric property="responseTime" ...
+        &lt;metric property="status" ...
+       &lt;/service&gt;
+    &lt;/server&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_a_word_about_configuration_and_properties">A word about configuration and properties</h3>
+<div class="paragraph">
+<p>The configuration type presented here, can be used in several forms within a
+plugin descriptor: plugin-configuration
+and resource-configuration inside a resource type and then also inside
+<code>operation</code> elements.
+Check the structure diagram in section <a href="#ref-pd-main">plugin descriptor</a> above
+to see where they belong.
+A configuration can consist of a number of sub-elements - notably properties
+that are children of the abstract configurationType. This is described below.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/configuration_structure.png" alt="Structure of configuration elements">
+</div>
+</div>
+<div class="paragraph">
+<p>In addition it is possible to group properties together in the group element.
+The GUI will show those in their own collapsible section. Allowed child elements
+of group are one description element and instances of the abstract
+configuration-property. Templates allow you to preset some configuration
+properties, so the user has only to fill in stuff that is needed or that they
+want to change. The template itself is of the configuration type and thus no
+shown again.</p>
+</div>
+<div class="sect3">
+<h4 id="_properties">Properties</h4>
+<div class="paragraph">
+<p>Properties allow you to specify individual aspects of a configuration. There are
+three types of properties:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>simple-property: for one key value pair, as shown above</p>
+</li>
+<li>
+<p>map-property: for a bunch of key value pairs, following the java.util.Map
+concept</p>
+</li>
+<li>
+<p>list-property: for a list of properties.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/configuration_property_structure.png" alt="Structure of configuration-property elements">
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see from the structural diagram, it is possible to nest configuration
+properties within list-property and map-property elements to compose more
+complex configurations.
+If we would want to allow our Services to add multiple remote servers with
+properties of <em>host</em>, <em>port</em>, <em>protocol</em> it could look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;plugin-configuration&gt;
+  &lt;c:list-property name="Servers"&gt;
+    &lt;c:map-property name="OneServer"&gt;
+      &lt;c:simple-property name="host"/&gt;
+      &lt;c:simple-property name="port"&gt;
+        &lt;c:integer-constraint <i class="conum" data-value="1"></i><b>(1)</b>
+            minimum="0"
+            maximum="65535"/&gt;
+        &lt;/c:simple-property&gt;
+      &lt;c:simple-property name="protocol" default="true&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+        &lt;c:property-options&gt;
+          &lt;c:option value="http"/&gt;
+          &lt;c:option value="https"/&gt;
+        &lt;/c:property-options&gt;
+      &lt;/c:simple-property&gt;
+    &lt;/c:map-property&gt;
+  &lt;/c:list-property&gt;
+&lt;/plugin-configuration&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The port has a
+constraint so, the GUI can validate the input being between 0 and 2^16-1.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>For
+the protocol, we offer the user a drop down list / radio buttons to choose the
+protocol from. It defaults to <em>http</em>, as indicated on the option element.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_change_in_discovery_components">Change in discovery components</h3>
+<div class="paragraph">
+<p>These changes are - as already indicated - more or less just for clarity
+reasons and to clearly separate out the concerns of each component.</p>
+</div>
+<div class="sect3">
+<h4 id="_server_level_httpdiscoverycomponent">Server level: HttpDiscoveryComponent</h4>
+<div class="paragraph">
+<p>The HttpDiscoveryComponent from above only got some minor adjustments to cater
+for the change in naming, so I am not showing it here - have a look at the
+provided sources archive for details.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_service_level_httpservicediscoverycomponent">Service level: HttpServiceDiscoveryComponent</h4>
+<div class="paragraph">
+<p>The <code>HttpServiceDiscoveryComponent</code> is more interesting, as we no longer have
+the hard coded keys, but we get the URL passed in from the GUI when the user is
+adding a new one. Here you will also see a new facet (<code>ManualAddFacet</code>), that
+has been introduced to support <code>supportsManualAdd="true"</code> from the plugin
+descriptor.
+Let&#8217;s start with the basic implementation of <code>ResourceDiscoveryComponent</code>, which
+unfortunately always has to be implemented for the discovery class, even if
+no autodiscovery is needed as in our case.:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">public class HttpServiceDiscoveryComponent implements
+   ResourceDiscoveryComponent, ManualAddFacet
+{
+   public Set&lt;DiscoveredResourceDetails&gt; discoverResources
+        (ResourceDiscoveryContext context) throws
+         InvalidPluginConfigurationException, Exception
+   {
+      return Collections.emptySet(); <i class="conum" data-value="1"></i><b>(1)</b>
+   }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This just returns an empty set, as we don&#8217;t want to automatically discovery
+these kinds of resources.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The implementation of the <code>ManualAddFacet</code> then looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">    @Override
+    public DiscoveredResourceDetails discoverResource(
+        Configuration pluginConfiguration,  <i class="conum" data-value="1"></i><b>(1)</b>
+        ResourceDiscoveryContext context)
+        throws InvalidPluginConfigurationException {
+
+        ResourceType resourceType = context.getResourceType();
+        String key = pluginConfiguration.getSimpleValue("url", null);
+        if (key == null)
+            throw new InvalidPluginConfigurationException("No URL provided");
+        String name = key;
+        String description = "Http server at " + key;
+        DiscoveredResourceDetails detail = new DiscoveredResourceDetails(
+            resourceType,
+            key,
+            name,
+            null,
+            description,
+            pluginConfiguration,
+            null);
+        return detail;
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is the plugin configuration that the user has entered in the UI when
+adding the resource.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This methods gets one create request at a time passed in. We check if there is
+some url given
+at all (in fact the definition in the plugin descriptor prevents empty
+properties already, but
+it is good to check anyway) and then just creates a new
+<code>DiscoveredResourceDetails</code> object, which
+is then returned.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_change_in_plugin_components">Change in plugin components</h3>
+<div class="paragraph">
+<p>The change in plugin components in basically that the old <code>HttpComponent</code> got
+renamed to <code>HttpServiceComponent</code> and that we have a new "pseudo"
+<code>HttpComponent</code> on server level.</p>
+</div>
+<div class="sect3">
+<h4 id="_server_level_httpcomponent">Server level - HttpComponent</h4>
+<div class="paragraph">
+<p>Ok, this one is - as just described - a dummy implementation, as it just
+provides placeholder methods from the ResourceComponent interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">    public AvailabilityType getAvailability() {
+        return AvailabilityType.UP;
+      }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We set the Availability to being always UP so the component can successfully
+start. We leave the other two methods just as empty implementations.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_service_level_httpservicecomponent">Service level - HttpServiceComponent</h4>
+<div class="paragraph">
+<p>As indicated this is more or less the old HttpComponent except for one change:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">    public void start(ResourceContext context) throws
+        InvalidPluginConfigurationException, Exception
+    {
+        url = new URL(context.getResourceKey()); // Provide an initial status, so
+                                                // getAvailability() returns up
+        status = "200";
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We are now setting the URL when the component is starting be reading it from the
+passed ResourceContext.
+Building the enhanced plugin
+The updated plugin can be built as shown in the previous part by calling <code>mvn
+-Pdev</code> install in the root of plugin source tree.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You have just seen, how easy it is to pass plugin configuration parameters from
+the GUI to a plugin by expressing the parameters in the plugin descriptor. Our
+plugin is now able to have an arbitrary number of child services that each
+monitor a different remote http server. The changes needed are basically a few
+more lines of XML and a little bit more Java code.</p>
+</div>
+<div class="paragraph">
+<p>The sources are again available as zip archive. Just install it like the
+previous one (overwrite the previous one).</p>
+</div>
+</div>
+</div>
+<h1 id="_advanced_topics" class="sect0">Advanced topics</h1>
+<div class="sect1">
+<h2 id="_preface_2">Preface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this part we see some more advanced topics that you don&#8217;t need
+when starting to write a plugin or to just follow the example.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_things_to_consider_when_writing_a_plugin">Things to consider when writing a plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that you have seen how to write a plugin, lets have a short break to discuss
+a few things to consider when writing a plugin.</p>
+</div>
+<div class="paragraph">
+<p>The method <code>getValues()</code> from the <code>MeasurementFacet</code> is called from the plugin
+container in intervals given by the user. This is usually something in the
+minutes range, but could be shorter. As the container tries to call
+<code>getValues()</code> for all metrics of a resource (that are due for metric collection)
+at once, it means that taking a single metric can only take (interval / number
+of resources) time at maximum. So make gathering the metrics fast. If directly
+taking a metric takes a long time (e.g. because a connection to a resource needs
+to be established first), consider to start an own measurement thread that is
+taking the data and putting it into local storage and then have <code>getValues()</code>
+just read out the local storage.</p>
+</div>
+<div class="paragraph">
+<p>Another thing to consider is the grouping of resource types:  when yo plan on
+having multiple items of one category (e.g. multiple http servers to check),
+then its good to have a parent for all of those, like the HttpComponent above.
+This is also good practice if you plan on implementing the addition of new child
+resources, as the create code needs to be in the parent (HttpComponent for
+HttpServices).</p>
+</div>
+<div class="sect2">
+<h3 id="_decomposing_plugins">Decomposing Plugins</h3>
+<div class="paragraph">
+<p>When you try to manage larger systems like the JBoss Application Server with all
+its subsystems like Cache, Transactions, JBossWeb etc. your plugin might get
+relatively large to support all this. In this posting I will show you how to
+decompose a large(r) plugin into smaller ones that all together allow you to
+manage the large(r) system.</p>
+</div>
+<div class="paragraph">
+<p>This decomposition not only allows you to more easily distribute the development
+load, but also enables re-use of the parts that have been broken out of the big
+chunk. The price you have to pay is relatively small and consists mostly of some
+additional directories and a maven pom.xml file (that I am not going to show
+here).</p>
+</div>
+<div class="paragraph">
+<p>The basic trick is to use <code>&lt;depends&gt;</code> and <code>&lt;runs-inside&gt;</code> tags in your plugin
+descriptor for this new plugin:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>&lt;plugin name="JBossCache" ... &gt;
+   &lt;depends plugin="JMX" /&gt;
+   &lt;depends plugin="JBossAS" useClasses="true"/&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So we need the JMX plugin and the JBossAS plugin being deployed before our
+plugin can start. The attribute <em>useClasses</em> means that the classloader of our
+plugin gets access to the classes of the other plugin (JBossAs here). So we can
+use those classes too.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>&lt;service name="JBoss Cache" ...&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you know from previous posts, a service can&#8217;t just "hang in the air" - it
+needs another server or service as a container. This is where runs-inside comes
+into play:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre> &lt;runs-inside&gt;
+   &lt;parent-resource-type name="JBossAS Server" plugin="JBossAS"/&gt;
+&lt;/runs-inside&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So our plugin service "JBoss Cache" will be contained in resources of type
+"JBossAS Server" that come from the JBossAS plugin (that we declared in the
+depends element earlier).</p>
+</div>
+<div class="paragraph">
+<p>Apart from this little magic in the plugin descriptor, there is no more
+additional work to do.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_process_scans_for_discovery">Using Process scans for discovery</h3>
+<div class="paragraph">
+<p>Often when you want to discover resources, they are not virtual like the remote
+http servers in our examples, but processes on the local machine. The RHQ agent
+offers through its SIGAR library to query the process table in order to detect
+those resources. As you may have guessed, this involves the plugin descriptor,
+so lets have a look at this first before going to the discovery component</p>
+</div>
+<div class="sect3">
+<h4 id="_process_scans_in_the_plugin_descriptor">Process-scans in the plugin descriptor</h4>
+<div class="paragraph">
+<p>As you have seen in the structural diagram of the plugin descriptor, each of
+platform/server/service can have <code>&lt;process-scan&gt;</code> elements. The element itself
+is empty, but has two required attributes: <em>name</em> and <em>query</em>. Name just names
+this specific scan method. Query is the interesting part. It is a string written
+in PIQL (Process Info Query Language), which is documented in the JavaDoc to its
+class. I don&#8217;t want to go into detail here and just show three example
+queries. Visit the page just mentioned to learn more.</p>
+</div>
+<div class="paragraph">
+<p><strong>Query 1: find a JBossAS</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>process|basename|match=^java.*,arg|org.jboss.Main|match=.*</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We want to query for a process, whose name is starting with java and which has
+an argument of org.jboss.Main - a Jboss Server. The matching entry from ps is:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>hrupp     2035   0.0 -1.5   724712  30616  p7  S+    9:49PM   0:01.61 java -Dprogram.name=run.sh
+ -Xms128m
+ -Xmx512m -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000
+ -Djboss.platform.mbeanserver -Djava.endorsed.dirs=/devel/jboss-4.0.5.GA/lib/endorsed -classpath
+ /devel/jboss-4.0.5.GA/bin/run.jar:/lib/tools.jar org.jboss.Main -c minimal</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Query 2: find a process by its pid</strong></p>
+</div>
+<div class="paragraph">
+<p>Here the program id is stored in a file in a well known place
+    process|pidfile|match=/etc/product/lock.pid</p>
+</div>
+<div class="paragraph">
+<p>PIQL will take the pid from <code>/etc/product/lock.pid</code> and search for a process
+with that id</p>
+</div>
+<div class="paragraph">
+<p><strong>Query 3: find a process by a certain command line argument</strong></p>
+</div>
+<div class="paragraph">
+<p>We now try to find processes that have <code>-Djava.awt.headless</code> as argument.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>arg|*|match=.*-Djava.awt.headless=true.*</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>90198 /Library/Java/JavaVirtualMachines/1.7.0u.jdk/Contents/Home/bin/java
+94136 /Library/Java/JavaVirtualMachines/1.7.0u.jdk/Contents/Home/bin/java</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example two matching processes were found.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_interactively_testing_piql_queries">Interactively testing piql queries</h4>
+<div class="paragraph">
+<p>The agent allows you to interactively test and refine piql queries at its
+command prompt.</p>
+</div>
+<div class="paragraph">
+<p>After the
+agent has started it will wait at the command prompt "<code>&gt;</code>", where you can issue
+the piql
+query starting with the word <code>piql</code>:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>&gt; piql arg|*|match=.*-Djava.awt.headless=true.*
+PIQL Query: [arg|*|match=.*-Djava.awt.headless=true.*]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example shows the query by argument that we have just seen in the previous
+paragraph.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_discovery_component_revisited">Discovery component revisited</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Ok, now that we have seen what we can do with the <code>&lt;process-scan&gt;</code> in the plugin
+descriptor, lets see how we can process that info. And .. as you may have
+already expected this is again very simple:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>List&lt;ProcessScanResult&gt; autoDiscoveryResults =
+    context.getAutoDiscoveredProcesses();
+for (ProcessScanResult result : autoDiscoveryResults) {
+    ProcessInfo procInfo = result.getProcessInfo();
+           ....
+    // as before
+    DiscoveredResourceDetails detail =
+        new DiscoveredResourceDetails( resourceType, key, name, null,
+             description, childConfig, procInfo );
+    result.add(detail);
+   }</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So basically you jut need to obtain the list of resources discovered by process
+scan (auto discovered as opposed to a manual add) and create the
+<code>DiscoveredResourceDetails</code> as before. You can use ProcessInfo to get more
+information about the process and to even decide not to include it in the list
+of auto discovered resources (imagine, the PIQL query would have looked for
+processes where the name starts with post. This would apply to postgres and
+postmaster. Here you could still filter the ones you really want.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_a_few_more_facets">A few more Facets</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We have seen the MeasurementFacet in the previous articles. In this section I
+will briefly mention the other kinds of facets, so that you can get an idea what
+plugins are capable to do.</p>
+</div>
+<div class="sect2">
+<h3 id="_configurationfacet">ConfigurationFacet</h3>
+<div class="paragraph">
+<p>This facet indicates that the plugin is able to read and write the configuration
+of a managed resource. It goes hand in hand with <code>&lt;resource-configuration&gt;</code> in
+the plugin descriptor. As I&#8217;ve stated above, the code to create a new managed
+resource from scratch needs to be on the parent resource, so it is a good idea
+to write plugins that use the ConfigurationFacet in a way that they have a
+parent resource for the subsystem and children for individual resources. You can
+find an example for this in the JbossAS plugin when looking at the
+JbossMessaging subsystem and the individual JMS destinations.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_operationfacet">OperationFacet</h3>
+<div class="paragraph">
+<p>An operation allows you to invoke functionality on the managed resource. This
+could be a restart operation or whatever you want to invoke on a target.
+Operations are described in <code>&lt;operation&gt;</code> elements in the plugin descriptor.
+They can have argument and return values.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_contentfacet">ContentFacet</h3>
+<div class="paragraph">
+<p>This facet allows the uploading content like files or archives into the managed
+resource. That way it is possible to centrally manage software distribution into
+managed resources. There exists a <code>&lt;content&gt;</code> element as counterpart.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_events">Events</h3>
+<div class="paragraph">
+<p>Events are a way to inject asynchronous data into the RHQ server. One example of
+Events within RHQ
+is the gathering and parsing of logfiles. Events are a little bit like traits
+in the sense that new data does not arrive at fixed intervals.
+The difference here is that one Event definition can match multiple event
+sources and that the number of Events that are delivered to the RHQ server can
+be different each time the polling for Events is called.
+Events are processed by EventPollers - a method that gets called at a regular
+interval by the PluginContainer and which delivers one or more Events back into
+the system.</p>
+</div>
+<div class="paragraph">
+<p>Two samples for EventPollers are the Logfile pollers, that check for new
+matching lines in logfiles and the snmptrapd plugin that I will describe now.
+The plugin descriptor is mostly as we know it already. There is now one new
+element:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>&lt;event name="SnmpTrap" description="One single incoming trap"/&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The important part here is the name attribute, as we will need its content later
+again. The name is the key into the EventDefinition object.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_plugin_component_3">Plugin Component</h3>
+<div class="paragraph">
+<p>In the plugin component, we are using start() and stop() to start and stop
+polling for events:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    public void start(ResourceContext context) throws
+InvalidPluginConfigurationException, Exception {
+     
+        eventContext = context.getEventContext();
+        snmpTrapEventPoller = new SnmpTrapEventPoller();
+        eventContext.registerEventPoller(snmpTrapEventPoller, 60);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So first we are getting an EventContext from the passed ResourceContext,
+instantiate an EventPoller and register this Poller with the EventContext (60 is
+the number of seconds between polls).
+The plugin container will start its timer when this registration is done.
+In <code>stop()</code> we just unregister the poller again:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>eventContext.unregisterEventPoller(TRAP_TYPE);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TRAP_TYPE is the ResourceType name as String - we will see this again in a
+second.</p>
+</div>
+<div class="paragraph">
+<p>The remainder of this class is nothing special and if you have read the plugin
+development series, it should actually be no news at all.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_event_poller">Event Poller</h3>
+<div class="paragraph">
+<p>This class is the only real new piece in the game.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>public class SnmpTrapEventPoller implements EventPoller {</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Implementing EventPoller means to implement two methods:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>public String getEventType() {
+  return SnmpTrapdComponent.TRAP_TYPE;
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here we return the content of the name attribute from the <code>&lt;event&gt;</code> tag of the
+plugin descriptor. The plugin will not start if they don&#8217;t match.</p>
+</div>
+<div class="paragraph">
+<p>The other method to implement is <code>poll()</code>:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>public Set&lt;Event&gt; poll() {
+  Set&lt;Event&gt; eventSet = new HashSet&lt;Event&gt;();
+            ...
+  return eventSet;
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To create one Event object you just instantiate it. The needed type can just be
+obtained by a call to <code>getEventType()</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creation_and_deletion_of_managed_resources">Creation and deletion of managed resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>So far we have only seen resources that were already present on the target, which
+is true in most cases. Sometimes you want to create a new resource though:
+think of a new database table or a user. When monitoring and managing
+application servers you may also want to upload new applications or remove
+existing ones.</p>
+</div>
+<div class="paragraph">
+<p>As in previous cases, this functionality needs to be "enabled" in the plugin
+descriptor and then also implemented in code.</p>
+</div>
+<div class="sect2">
+<h3 id="_plugin_descriptor_2">Plugin descriptor</h3>
+<div class="paragraph">
+<p>In the plugin descriptor you will find two attibutes inside the
+plattform/server/service elements that govern the creation and deletion
+of resources</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>createDeletePolicy: This attribte describes wether you can create and/or
+delete such resouces. You have the four choices of <em>neither</em>, <em>create-only</em>,
+<em>delete-only</em> and <em>both</em> with <em>none</em> being the default.</p>
+</li>
+<li>
+<p>creationType: This attribute determines if the new resource is created
+based on content that the user supplies via the server (<em>content</em>) or if
+it is purely created based on configuration data (<em>configuration</em>), which
+is also the default.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If the new resource is based upon a configuration, you need to also provide
+the information about the conifguration items in the plugin descriptor:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;server name="Parent"
+  class="ParentComponent"
+  ... &gt;
+  &lt;service name="FileTest"
+     class="FileComponent"
+     createDeletePolicy="both"
+     creationType="configuration"&gt;
+
+     &lt;resource-configuration&gt;
+       &lt;c:simple-property name="filename" required="true"&gt;
+    &lt;/resource-configuration&gt;
+  &lt;service&gt;
+&lt;/server&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_and_the_code_for_creation">And the code for creation</h3>
+<div class="paragraph">
+<p>Creation of child resources needs to be enabled in the <em>parent</em>
+resource component (in above example this would be the <em>ParentComponent</em>).
+ While this sounds very logical it has the drawback that
+if you write a plugin that is embedded into another plugin, you need to change
+the plugin that embeds yours. A workaround can be to introduce a thin layer
+for the "subsystem" of your plugin, that defines the availability of the
+subsystem, provides some metrics and then provides the code to create the
+child resources.</p>
+</div>
+<div class="paragraph">
+<p>To create child resources you need to implement the
+<code>CreateChildResourceFacet</code> which has one method to implement
+<code>CreateResourceReport createResource(CreateResourceReport report);</code>. This
+method gets a report passed in which describes the parameters for the
+resource creation.</p>
+</div>
+<div class="paragraph">
+<p>Below is a simple example that creates a new file (resource) somewhere
+in the file system. First the creation part in the <em>ParentComponent</em> class:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">CreateResourceReport createResource(CreateResourceReport report) {
+
+    Configuration configuration = report.getResourceConfiguration();   <i class="conum" data-value="1"></i><b>(1)</b>
+    PropertySimple fName = configuration.getSimpleValue("filename",null);
+    if (fName==null) {
+        report.setStatus(CreateResourceStatus.INVALID_CONFIGURATION);  <i class="conum" data-value="2"></i><b>(2)</b>
+        report.setErrorMessage("File name not given");
+        return report;
+    }
+    File file = new File(fName);  <i class="conum" data-value="3"></i><b>(3)</b>
+    ...
+    report.setStatus(CreateResourceStatus.SUCCESS);   <i class="conum" data-value="4"></i><b>(4)</b>
+    report.setResourceKey(file.getAbsolutePathName());
+    report.setResourceName(report.getUserSpecifiedResourceName());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get the user provided configuration</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The passed configuration was bad, so let the user know</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configuration was good, so create the resource (= the file)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Creation was a success, so let the user know too.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The resource created is now of the type <em>FileType</em>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="__and_deletion">&#8230; and deletion</h3>
+<div class="paragraph">
+<p>The deletion code goes into the component class of the created object type,
+which is the <em>FileComponent</em> in our above example. This needs now to implement
+the <code>DeleteResourceFacet</code> with its one method <code>deleteResource()</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="java language-java">public void deleteResource() throws Exception {
+
+    Configuration = context.getPluginConfiguration()  <i class="conum" data-value="1"></i><b>(1)</b>
+    PropertySimple fName = configuration.getSimpleValue("filename",null);  <i class="conum" data-value="2"></i><b>(2)</b>
+    File file = new File (fName);
+    boolean gone = file.delete(); <i class="conum" data-value="3"></i><b>(3)</b>
+    if (!gone) {
+       throw new Exception("File not found"); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>context</code> has been passed in the <code>start()</code> method and is now used to retrieve
+the plugin configuration</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We now obtain the file name</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>And try to delete the resource</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>If deletion failed, we throw an excpeiton</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_plugin_inheritance">Plugin inheritance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When writing plugins you will often come to a point where you e.g. need to
+talk to a JMX <span class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnote_3" title="View footnote.">3</a>]</span> server such as an arbitrary
+JVM. Or you want to write a plugin for a database that RHQ does not yet support.
+Of course it is possible to write the JMX or Database connection code by hand,
+but the better way is to re-use the existing plugins. In case of Databases,
+you can use the Database plugin for this purpose.</p>
+</div>
+<div class="paragraph">
+<p>The following is taken from the Postgres-plugin:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>&lt;plugin... &gt;</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>&lt;depends plugin="Database" useClasses="true"/&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the depends element you tell your plugin that it requires the
+plugin with the name <em>Database</em> to be present and that you want to
+use the classes it provides.</p>
+</div>
+<div class="paragraph">
+<p>A more interesting case is when the base plugin already defines a tree of
+resource types in which you want to hook the classes of your plugin in.
+One example in the RHQ source is the Hibernate plugin that can run on
+top of a JMX resource, the JBoss Application Server or inside Tomcat.</p>
+</div>
+<div class="sect2">
+<h3 id="_zip_less_plugins">Zip-less plugins</h3>
+<div class="paragraph">
+<p>In the past it was always required that you package a plugin within
+a zip-archive - even if it was only having a plugin descriptor (like
+a plugin that inherits from a base plugin and where the layered plugin
+only uses classes from this base plugin (e.g. to provide additional
+metrics).</p>
+</div>
+<div class="paragraph">
+<p>It is now possible to deploy those plugin-descriptors on their own if
+their name follows the <code>*-rhq-plugin.xml</code> naming convention.
+Of course for this to work the base plugin already needs to be deployed.</p>
+</div>
+</div>
+</div>
+</div>
+<h1 id="_tools" class="sect0">Tools</h1>
+<div class="sect1">
+<h2 id="_preface_3">Preface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes tools around the development of agent plugins.
+While the process is straightforward, there are still a lot of steps
+to consider when writing and testing the plugin.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_plugin_generator">Plugin generator</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Above you have seen that writing a plugin is not that hard, but that it still
+needs a lot of work to
+get the basic environment like plugin descriptor skeleton, maven-pom-file and
+directory structure in place.
+RHQ project has a plugin generator, which asks you some questions and will then
+generate a plugin
+with some dummy values, which you can then load into your development
+environment and continue
+working with.</p>
+</div>
+<div class="paragraph">
+<p>You can download the generator from RHQ&#8217;s presence on
+<a href="http://sourceforge.net/projects/rhq/files/rhq/plugin-generator/">SourceForge</a>
+or build it from source in the RHQ source.</p>
+</div>
+<div class="sect2">
+<h3 id="_sample_run">Sample run</h3>
+<div class="paragraph">
+<p>You can just start the plugin generator via <code>java -jar</code>. It will then
+prompt you with a number of questions, where some have a default like <em>n</em> in
+<em>(y/N)</em>, that you can apply by pressing return.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ java -jar target/rhq-pluginGen-4.5.0-SNAPSHOT.jar</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>First we need to determine the resource category of the root type in the plugin.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    Please specify the plugin root category PLATFORM(P), SERVER(S), SERVICE(I),
+s</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next we need to give the name of the base type of the plugin, which is also
+taken as the directory name of the plugin, the package for the plugin&#8217;s classes
+as well as the base directory into which our plugin will be written.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Please specify its Name: jmxdemo
+Please specify its PackagePrefix: org.rhq.plugins
+Please specify its FileSystemRoot: /im/rhq/modules/plugins</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally you need to provide the class names of the component and discovery
+classes of the plugin.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Please specify its ComponentClass: DemoComponent
+Please specify its DiscoveryClass: DemoDiscovery</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From here on, the generator asks for support of the various facets and
+will then create respective entries in the plugin descriptor, as well
+as in generated code artefacts.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Please specify if it should support Events (y/N):
+Please specify its ParentType: MBeanResourceComponent
+Please specify if it should support HasMetrics (y/N):
+Please specify if it should support HasOperations (y/N):
+Please specify if it should support Singleton (y/N):
+Please specify if it should support ResourceConfiguration (y/N):
+Please specify if it should support SupportFacet (y/N):
+Please specify if it should support CreateChildren (y/N):
+Please specify if it should support UsesExternalJarsInPlugin (y/N):
+Please specify if it should support DeleteChildren (y/N):
+Please specify if it should support ManualAddOfResourceType (y/N):
+Please specify if it should support UsePluginLifecycleListenerApi (y/N):</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If your plugin needs JMX to talk to the managed resource, you can use the
+JMX-plugin for RHQ that helps you with connecting to the JMX server etc.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Please specify if it should support DependsOnJmxPlugin (y/N): y</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally you need to provide some more information about the plugin
+itself like the version of RHQ to build with, the name as it shows up in the UI
+and some descriptions.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Please specify its RhqVersion: 4.5.0-SNAPSHOT
+Please specify its PluginName: rhq-jmxdemo
+Please specify its PluginDescription: Test for local JMX connections
+Please specify its Description: Test JDK6 jmx connections</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Do you want to add a child to jmxdemo? (y/N) n</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you choose to add a child resource type to the above, you need to proide
+the Facet and other information about the child type. Otherwise the generator
+will continue, print a summary of your input and then generate the
+artifacts.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    Aug 23, 2012 2:32:11 PM org.rhq.helpers.pluginGen.PluginGen run
+    INFO:
+    You have chosen:
+    Props{category=SERVER, name='jmxdemo', description='Test JDK6 jmx
+connections', packagePrefix='org.rhq.plugins', pkg='null',
+discoveryClass='DemoDiscovery', componentClass='DemoComponent',
+parentType='MBeanResourceComponent', fileSystemRoot='/im/rhq/modules/plugins',
+monitoring=false, operations=false, metricProps=[], operationProps=[],
+singleton=false, resourceConfiguration=false, events=false, supportFacet=false,
+createChildren=false, deleteChildren=false, usesExternalJarsInPlugin=false,
+manualAddOfResourceType=false, usePluginLifecycleListenerApi=false,
+dependsOnJmxPlugin=true, rhqVersion='4.5.0-SNAPSHOT', children=[],
+simpleProps=[], templates=[], runsInsides=[]}
+    Aug 23, 2012 2:32:11 PM org.rhq.helpers.pluginGen.PluginGen generate
+    INFO: Generating...
+    Aug 23, 2012 2:32:11 PM org.rhq.helpers.pluginGen.PluginGen createFile
+    INFO: Trying to generate /im/rhq/modules/plugins/jmxdemo/pom.xml
+    Aug 23, 2012 2:32:11 PM org.rhq.helpers.pluginGen.PluginGen createFile
+    INFO: Trying to generate /im/rhq/modules/plugins/jmxdemo/src/main/resources/META-INF/rhq-plugin.xml
+    Aug 23, 2012 2:32:12 PM org.rhq.helpers.pluginGen.PluginGen createFile
+    INFO: Trying to generate /im/rhq/modules/plugins/jmxdemo/src/main/java/org/rhq/plugins/jmxdemo/DemoDiscovery.java
+    Aug 23, 2012 2:32:12 PM org.rhq.helpers.pluginGen.PluginGen createFile
+    INFO: Trying to generate /im/rhq/modules/plugins/jmxdemo/src/main/java/org/rhq/plugins/jmxdemo/DemoComponent.java
+    Aug 23, 2012 2:32:12 PM org.rhq.helpers.pluginGen.PluginGen generate
+    INFO: Done ..</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When it is done, it will also remind you of some next steps.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Don't forget to
+  - add your plugin to the parent pom.xml if needed
+  - edit pom.xml of your plugin
+  - edit rhq-plugin.xml of your plugin</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At this point you will have a plugin fragment that you can then load into your
+editor and start coding.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_standalone_plugin_container">Standalone plugin container</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Above I have described how you can deploy the plugin to the server and then when
+it is deployed tell the
+agent to fetch it to also have it deployed there. Especially when you start
+writing a new plugin, this process is tedious and slow.</p>
+</div>
+<div class="paragraph">
+<p>Luckily there is a way you can test the functionality of the plugin classes
+without the need to deploy it to the server (If you need to see how things
+render on the server, you still need to deploy it there though). The
+<em>standalone plugin container</em> allows you to just load the plugin you want to
+test (plus its dependencies, which include the platform plugin) and then issue
+commands in an interactive shell.</p>
+</div>
+<div class="paragraph">
+<p>If you for example want to test the Tomcat plugin, which depends on the
+jmx-plugin to make connections to the target servers, you would put the
+tomcat-, the jmx- and the platform-plugin into the agents <code>plugins/</code>
+directory before starting the standalone container.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+removing not-needed plugins from the <code>plugins/</code> directory
+improves the time for startup and also discovery later. In fact you
+can in many cases even omit the platform plugin.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_sample_run_2">Sample run</h3>
+<div class="paragraph">
+<p>To start the standalone PC, you change into the agent directory, copy your
+plugin into the <code>plugins</code> subdirectory and then call</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ bin/standalone-pc.sh</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>in the agent directory
+<span class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnote_4" title="View footnote.">4</a>]</span>, which
+will print a few messages about loading plugins and then wait at a command
+prompt. If your plugin does not show up in the printed list, it has probably
+some errors in the plugin descriptor. You
+can find out by looking at the agent log in <code>logs/agent.log</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Starting the standalone-pc</div>
+<div class="content">
+<pre>hrupp$ bin/standalone-pc.sh
+
+Starting the plugin container.
+Loading plugins
+...Loaded plugin: HttpCheck
+...Loaded plugin: Platforms
+
+Ready.
+[0]:0 &gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The command prompt now waits for your input. The number in the square brackets
+is the number of the current command. The number after the colon a resource id;
+we will see that in more detail later. To see a list of commands, you can type
+<code>help</code>, which shows a list of commands, their abbreviation, possible arguments
+and a short description.</p>
+</div>
+<div class="paragraph">
+<p>One of the first things you want to do here is to discover resources</p>
+</div>
+<div class="listingblock">
+<div class="title">Discover resources</div>
+<div class="content">
+<pre>[0]:0 &gt; disc all
+Discovery took: 5408ms
+[Resource[id=-25, uuid=b1f......</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To select a resource and to issues specific commands to it, you can set it&#8217;s id:</p>
+</div>
+<div class="listingblock">
+<div class="title">Select a certain discovered resource</div>
+<div class="content">
+<pre>[1]:0 &gt; set id -2  <i class="conum" data-value="1"></i><b>(1)</b>
+[2]:-2 print .  <i class="conum" data-value="2"></i><b>(2)</b>
+Resource[id=-2, uuid=2eb2ef5b-9ad4-444b-a1a4-4cced69ff34f,
+  type={Platforms}Mac OS X, key=snert, name=snert, parent=&lt;null&gt;,
+  version=MacOSX 10.7.4]
+[3]:-2 &gt; m -list  <i class="conum" data-value="3"></i><b>(3)</b>
+Native.MemoryInfo.used : MEASUREMENT, The total used system memory
+  (does not include buffer or cache memory)
+Native.MemoryInfo.actualUsed : MEASUREMENT, The actual total used system
+  memory (includes buffer and cache memory)
+CpuPerc.sys : MEASUREMENT, Percentage of all CPUs running in system mode
+CpuPerc.user : MEASUREMENT, Percentage of all CPUs running in user mode
+[4]:-2 &gt; m CpuPerc.user <i class="conum" data-value="4"></i><b>(4)</b>
+MeasurementDataNumeric[name=CpuPerc.user,
+   value=0.1188118811881188, scheduleId=1, timestamp=1342878190137]</pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Fist we selected the resource with id -2</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We issued the <code>print</code> command to see details of this resource.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We inquired the list of available metrics for this resource (derived from
+the resource type)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>We query the value of the metric with the name <code>CpuPer.user</code>. It is possible
+to pass more than one metric name of a resource footnote::[Before RHQ 4.11 it was
+necessary to pass the data type (metric, trait) as 1st parameter, this no longer
+needed or supported.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+To learn about the commands available type <code>help</code> at the command prompt.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_getting_and_setting_the_plugin_configuration">Getting and setting the plugin configuration</h3>
+<div class="paragraph">
+<p>Above we have seen how to set the URL for the target to monitor. You can also
+inspect and set those
+values from the standalone container by running the <em>pc</em> and <em>pcs</em> commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[5]:-2 &gt; pc
+PropertyList[id=0, name=logs, list=[]]
+[6]:-2 &gt; pcs logs=bla
+[7]:-2 &gt; pc
+PropertySimple[id=0, name=logs, value=bla, override=null]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>pcs</em> command does by default set a full configuration, where individual
+key-value pairs are separated by <code>||</code>. Running <code>pcs</code> like this a second time
+overwrites the previously set values.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>[7]:-2 &gt; pcs key1=value1||key2=value2</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It is also possible to pass individual key-value pairs and merge them with the
+values set previously:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[7]:-2 &gt; pcs key1=value1
+[8|:-2 &gt; pcs -m key2=value2</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="icon-note" title="Note"></i>
+</td>
+<td class="content">
+There are analogous commands <code>rc</code> and <code>rcs</code> that can be used to get and set
+teh resource configuration.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_command_history">Command history</h3>
+<div class="paragraph">
+<p>When using the standalone-pc, you often want to repeat a command given. For this
+purpose a csh-like
+command syntax exists. Issuing <code>!h</code> gives you an overview of existing commands.</p>
+</div>
+<div class="paragraph">
+<p>To display the history you give <code>!?</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[8]:-2 &gt; !?
+  0&gt; res
+  1&gt; set id -2
+  2&gt; m -list
+  3&gt; m CpuPerc.user</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To re-run command 2 you say <code>!2</code>; to just re-run the last command, you can
+simply type <code>!!</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_finding_resources_by_criteria">Finding resources by criteria</h3>
+<div class="paragraph">
+<p>When you have a larger plugin you will see that the list of resources
+discovered can be quite large and that finding a certain resource
+involves a lot of scrolling. To make this process easier and also to
+cater for some automation (see next section), it is possible to run the
+<code>find</code> command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[13]: &gt; find r snert  <i class="conum" data-value="1"></i><b>(1)</b>
+-2: snert (parent= null )
+[14]:0 &gt; set r $r   <i class="conum" data-value="2"></i><b>(2)</b>
+[15]:-2 &gt; print
+ Resource[id=-2, uuid=2eb2ef5b-9ad4-444b-a1a4-4cced69ff34f,
+      type={Platforms}Mac OS X, key=snert, name=snert, parent=&lt;null&gt;,
+      version=MacOSX 10.7.4]</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We are searching for a resource with name <em>snert</em></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The variable <code>$r</code> now contains the resource id of the resource found
+and can be used to set the resource to work with.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_recording_and_replaying_of_commands">Recording and replaying of commands</h3>
+<div class="paragraph">
+<p>As you have seen, the system keeps a list of commands issued. You can write
+that list of commands
+to a file via <code>!w &lt;filename&gt;</code>. When you then start the container with that
+filename as argument, it will
+re-run the commands from the file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="bash language-bash">bin/standalone-pc.sh &lt;filename&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When the standalone container has run all the commands, it will just shut down.</p>
+</div>
+<div class="paragraph">
+<p>In many times when developing
+a new plugin, you want to continue issuing commands and for example check the
+executed plugin code in the
+debugger. To achieve this, add a <code>stdin</code> command before writing the file (or
+edit the generated file afterwards).</p>
+</div>
+<div class="paragraph">
+<p>To make the script resilient to changes in discovery order you can
+use the <code>find</code> command we have just discussed, so that you do not
+have to hard code resource ids.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_plugin_verification">Plugin verification</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>During development process you will often change items in the plugin descriptor
+and your java classes and
+if you make a mistake, you will only find out when you deploy the plugin to the
+server (or the standalone
+container). Actually there is a way to run a basic verification of the plugin.</p>
+</div>
+<div class="paragraph">
+<p>Previously this was only available as part of the whole build, or via some
+complex maven pom setup. With the <a href="#agent-plugin-plugin">Agent Plugin Plugin</a>
+there is now a standard way of running the verifyer by just adding another execution.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="agent-plugin-plugin">Agent Plugin Plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/tsegismont">Thomas Segismont</a> has created a maven plugin,
+called the <a href="https://github.com/rhq-project/rhq-agent-plugin-plugin">"RHQ Agent Plugin Plugin"</a>,
+which can be used to run the deployment magic on your local or remote server, run the validator
+and much more.</p>
+</div>
+<div class="paragraph">
+<p>The following shows an excerpt from a <code>pom.xml</code> file that can be used to deploy the
+plugin to the so called "dev-container":</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven setup for the Agent Plugin Plugin</div>
+<div class="content">
+<pre class="highlight"><code class="xml language-xml">&lt;build&gt;
+  &lt;plugins&gt;
+
+    &lt;plugin&gt;
+      &lt;groupId&gt;org.rhq.maven.plugins&lt;/groupId&gt;
+      &lt;artifactId&gt;rhq-agent-plugin-plugin&lt;/artifactId&gt;
+      &lt;version&gt;${rhq-agent-plugin-plugin.version}&lt;/version&gt;
+      &lt;extensions&gt;true&lt;/extensions&gt;
+      &lt;configuration&gt;
+        &lt;deployDirectory&gt;/im/run-rhq/dev-container/rhq-server/plugins/&lt;/deployDirectory&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+      &lt;/configuration&gt;
+
+      &lt;executions&gt;
+        &lt;execution&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+          &lt;id&gt;deploy-to-dev-container&lt;/id&gt;
+          &lt;goals&gt;
+            &lt;goal&gt;deploy&lt;/goal&gt;
+          &lt;/goals&gt;
+          &lt;phase&gt;package&lt;/phase&gt;
+        &lt;/execution&gt;
+        &lt;execution&gt;  <i class="conum" data-value="3"></i><b>(3)</b>
+          &lt;id&gt;validate-the-plugin&lt;/id&gt;
+          &lt;goals&gt;
+            &lt;goal&gt;validate&lt;/goal&gt;
+          &lt;/goals&gt;
+          &lt;phase&gt;package&lt;/phase&gt;
+          &lt;configuration&gt;
+            &lt;rhqVersion&gt;${rhq.version}&lt;/rhqVersion&gt;
+          &lt;/configuration&gt;
+        &lt;/execution&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Location of the server&#8217;s plugin directory</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>This execution does the deploy</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>This execution runs the plugin verification</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Actually you can do a lot more - have a look at the documentation for more examples.
+At the plugin is still in its early days, contributions are very welcome</p>
+</div>
+</div>
+</div>
+<h1 id="_appendix" class="sect0">Appendix</h1>
+<div class="sect1">
+<h2 id="_more_information_on_plugins">More information on Plugins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The RHQ wiki now hosts a plugin community page that shows available plugins: RHQ
+Plugin Community
+at <a href="https://docs.jboss.org/author/display/RHQ/Plugin+Community">https://docs.jboss.org/author/display/RHQ/Plugin+Community</a>.</p>
+</div>
+<div class="paragraph">
+<p>Check it out for any updates about plugin related information - including
+lists of new plugins.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_about_rhq">About RHQ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Red Hat and Hyperic released Project RHQ in the open in February 2008 and we
+released the first GA version of RHQ together with JBossON 2.0 that is built on
+top of RHQ at JavaOne 2008.</p>
+</div>
+<div class="paragraph">
+<p>RHQ developers can be reached in <strong>#rhq</strong> on <a href="irc://irc.freenode.net">irc://irc.freenode.net</a>, development
+forums are hosted on <a href="https://community.jboss.org/en/rhq/">https://community.jboss.org/en/rhq/</a> and the homepage is
+<a href="http://jboss.org/rhq/">http://jboss.org/rhq/</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_about_the_author">About the author</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Heiko W. Rupp is developer at Red Hat in the area of RHQ and JBoss ON.
+He contributed to JBoss AS and other open source projects in the past
+and wrote the first German JBoss book and one of the first German books on EJB3.
+He lives with his family in Stuttgart, Germany. Heiko&#8217;s twitter handle is
+<a href="http://twitter.com/pilhuhn">@pilhuhn</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnote_1">
+<a href="#_footnoteref_1">1</a>. In this document when we talk about plugins,
+we always mean _agent plugins-
+</div>
+<div class="footnote" id="_footnote_2">
+<a href="#_footnoteref_2">2</a>. In theory this could be seen as a platform service and we could put it
+below the platform, see <code>&lt;runs-inside&gt;</code> later in the article. Also there is a practice
+to use Server when something is process-based.
+</div>
+<div class="footnote" id="_footnote_3">
+<a href="#_footnoteref_3">3</a>. Java Management Extenions
+</div>
+<div class="footnote" id="_footnote_4">
+<a href="#_footnoteref_4">4</a>. Before RHQ 4.5, this command was not installed by default in the
+agent&#8217;s bin directory, but only in the sources under <code>etc/standalone-pc/</code>
+directory or on sourceforge at
+<a href="http://sourceforge.net/projects/rhq/files/rhq/standalone-container/">http://sourceforge.net/projects/rhq/files/rhq/standalone-container/</a> .
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2014-04-11 20:42:24 MESZ
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+= How to write a(n agent) plugin for RHQ and JBoss ON?
+Heiko W. Rupp <heiko.rupp@redhat.com>
+:toc:
+:doctype: book
+:source-highlighter: highlight.js
+:icons: font
+:experimental:
+:imagesdir: images
+:homepage: http://jboss.org/rhq/
+:license: cc-by-sa 3.0
+:author: Heiko W. Rupp
+:encoding: iso-8859-1
+:rhq.git: https://github.com/rhq-project/rhq
+:doc.git.home: TODO
+:rhq-version: 4.10.0
+
+
+[preface]
+== Preface
+This document builds on a series of blog postings I made on my blog at
+<http://pilhuhn.blogspot.com/search/label/RHQ>.
+This blog also features other JBoss ON, RHQ and plugin related content that is
+not contained here. While this document
+also applies to JBoss Operations Network (JBoss ON), I usually will just talk
+about RHQ.
+
+Please contact me or my colleagues if you have questions or suggestions.
+
+CAUTION: This document is a best effort attempt into describing the process of
+writing agent plugins for RHQ.
+This document may contain errors or omissions. The author assumes no liability.
+
+NOTE: This document is released under a Creative Commons 3.0  BY-SA license.
+
+Of course comments, bug fixes and additions are welcome.
+
+== Introduction
+
+RHQ Project is the foundation of a powerful open source system management suite.
+It builds the framework for other management applications like JBoss ON.
+While there is a core set of functionality, the capabilities to manage individual
+kinds of target resources is not hard coded into RHQ, but can (or must) be provided
+by _plugins_.
+
+This paper will try to show how to write your own plugins for RHQ. This could be
+"bare metal" plugins to e.g. determine free disk space or process
+availability. It could also be a plugin that determines the number and volume of
+orders flowing through your web shop.
+
+As an example scenario the plugin will try to reach a http server, see if the
+base URL is available and return the status code + the time it took to reach it.
+We will first write a simple version and enhance it afterwards. At the end
+I'll be talking about some additional topics around plugin development. But
+before we come to this, lets have a look at the environment.
+
+== General architecture of RHQ
+
+Before we go into detailed plugin writing, I first want to show the general
+architecture of RHQ and its plugin system.
+
+RHQ follows a hub and spoke approach: A central server (or cluster of servers)
+processes data coming in from agents. The data is stored in a database connected
+to the server(s). Users and administrators can look at the data and trigger
+operations
+on the server. This can happen through a web-based GUI, a command line interface
+or via the REST-api.
+
+image::rhq_arch.png[RHQ Architecture]
+
+Agents do not have a fixed (read as in compile-time) functionality, but can be
+extended through plugins footnote:[In this document when we talk about plugins,
+we always mean _agent plugins-] which we will see below. Usually there is one
+agent running per machine that has resources to manage.
+
+=== Server side services
+
+The server hosts a number of services like:
+
+* It has a view on the complete Inventory
+* It processes incoming measurement data
+* It triggers alerts to be sent
+* It triggers operations on managed resources
+* It hosts the graphical user interface
+* It hosts the user management
+* ...
+
+Some of those services are reflected in the agent like inventory syncing,
+gathering of measurement data or running operations on a managed resource, while
+alert processing or hosting of the GUI is purely on the server.
+
+NOTE: An RHQ server never directly talks to a managed resource. Only agents
+(or better: their plugins) talk to managed resources.
+
+=== Agent architecture
+
+The agent is sort of a container that hosts some common functionality like the
+communication interface with the server, logging, starting and stopping of
+plugins, reading configuration files or spooling data in case the server is not
+reachable. It is also handling of the command line and interactive command
+prompt.
+
+In addition to this, it hosts the plugin container, who hosts the actual
+plugins. When you write a plugin, you talk to the plugin container.
+
+image::agent_arch.png[Agent architecture]
+
+The agent also hosts its it is local view of the inventory (see next section)
+for the resources it knows.
+
+=== Central functionality: Inventory
+
+The central piece of functionality in RHQ is the inventory. Each resource that
+you want to manage or monitor must be present in that inventory. RHQ has
+mechanisms to auto detect and also manually add resources. We'll come back to
+that later when we are talking about implementing plugins.
+Each `org.rhq.core.domain.resource.Resource` has a certain
+`org.rhq.core.domain.resource.ResourceCategory`:
+
+* Platform: This is basically a host where things run on
+* Server: Things like database server, JbossAS instance or the RHQ agent
+* Service: (Fine grained) Services offered by a server
+
+The ResourceCategory is sort of hierarchic as you can see on the next image:
+
+image::resource_category.png[ResourceCategory]
+
+A platform hosts servers, a server can host other servers and services and a
+service can host other services. In theory it is also possible that a platform
+is hosting other platforms.
+As an example: you have a Red Hat Linux platform, which hosts the RHQ Agent and
+JBossAS as a server. This AS it self is hosting a Tomcat server. Both JBossAS
+and Tomcat are hosting services like JMS or Connectors.
+So at the end this will result in a tree of resources with the Linux platform as
+its root.
+In addition to the category each Resource also is of a certain
+`org.rhq.core.domain.resource.ResourceType`. For a platform this might e.g.
+"Max OS X", "Red Hat Linux", "Debian Linux" etc. Or the JBossAS and
+Tomcat from above are both of category Server, but have different ResourceType.
+
+
+include::example.adoc[]
+
+include::advanced.adoc[]
+
+include::tools.adoc[]
+
+= Appendix
+
+== More information on Plugins
+
+The RHQ wiki now hosts a plugin community page that shows available plugins: RHQ
+Plugin Community
+at https://docs.jboss.org/author/display/RHQ/Plugin+Community.
+
+Check it out for any updates about plugin related information - including
+lists of new plugins.
+
+== About RHQ
+
+Red Hat and Hyperic released Project RHQ in the open in February 2008 and we
+released the first GA version of RHQ together with JBossON 2.0 that is built on
+top of RHQ at JavaOne 2008.
+
+RHQ developers can be reached in *#rhq* on irc://irc.freenode.net, development
+forums are hosted on https://community.jboss.org/en/rhq/ and the homepage is
+{homepage}.
+
+== About the author
+
+Heiko W. Rupp is developer at Red Hat in the area of RHQ and JBoss ON.
+He contributed to JBoss AS and other open source projects in the past
+and wrote the first German JBoss book and one of the first German books on EJB3.
+He lives with his family in Stuttgart, Germany. Heiko's twitter handle is
+http://twitter.com/pilhuhn[@pilhuhn].

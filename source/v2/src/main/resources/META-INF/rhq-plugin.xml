@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<plugin name="HttpTest" displayName="HttpTest plugin"
+   package="org.rhq.plugins.httptest2" version="2.0"
+   description="Monitoring of http servers"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns="urn:xmlns:rhq-plugin" xmlns:c="urn:xmlns:rhq-configuration">
+
+   <server name="HttpCheck" description="Httpserver pinging"
+         discovery="HttpDiscoveryComponent"
+         class="HttpComponent">
+
+
+      <service name="HttpServer" discovery="HttpServiceDiscoveryComponent"
+         class="HttpServiceComponent" description="Http Server"
+         supportsManualAdd="true"
+         >
+
+      <plugin-configuration>
+         <c:simple-property name="url" type="string" required="true" />
+      </plugin-configuration>
+
+      <metric property="responseTime" displayName="Response Time"
+         measurementType="dynamic" units="milliseconds"
+         displayType="summary" />
+
+      <metric property="status" displayName="Status Code"
+         dataType="trait" displayType="summary" />
+
+   </service>
+   </server>
+
+</plugin>
