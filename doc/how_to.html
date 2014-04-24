@@ -423,7 +423,7 @@ span.icon > [class^="icon-"], span.icon > [class*=" icon-"] { cursor: default; }
 <li><a href="#_things_to_consider_when_writing_a_plugin">Things to consider when writing a plugin</a></li>
 <li>
 <ul class="sectlevel2">
-<li><a href="#_decomposing_plugins">Decomposing Plugins</a></li>
+<li><a href="#decomposing">Decomposing Plugins</a></li>
 <li><a href="#_using_process_scans_for_discovery">Using Process scans for discovery</a></li>
 </ul>
 </li>
@@ -761,7 +761,7 @@ measurement data etc.</p>
 <h3 id="ref-pd-main">Plugin descriptor</h3>
 <div class="paragraph">
 <p>The plugin descriptor is described by an XML Schema that you can find in the
-<a href="https://github.com/rhq_project/rhq/modules/core/client-api/src/main/resources/rhq-plugin.xsd">git repository</a>
+<a href="https://github.com/rhq-project/rhq/modules/core/client-api/src/main/resources/rhq-plugin.xsd">git repository</a>
 under <code>modules/core/client-api/src/main/resources/rhq-plugin.xsd</code>. The basic structure is as follows:</p>
 </div>
 <div class="imageblock">
@@ -773,7 +773,7 @@ under <code>modules/core/client-api/src/main/resources/rhq-plugin.xsd</code>. Th
 <p>The descriptor consists of a few sections. First you can express dependencies to
 other plugins. This is allows reuse of existing plugins and is useful when you
 e.g. want to write a plugin that itself needs the JMX plugin, so that it can do
-its work (see also "Decomposing Plugins" below).</p>
+its work (see also "<a href="#decomposing">Decomposing Plugins</a>" below).</p>
 </div>
 <div class="paragraph">
 <p>The next are a row of platform/server/service sections. Each of those can have
@@ -1499,6 +1499,10 @@ that are children of the abstract configurationType. This is described below.</p
 </div>
 </div>
 <div class="paragraph">
+<p>The configuration element is described in its own
+<a href="https://github.com/rhq-project/rhq/modules/core/client-api/src/main/resources/rhq-configuration.xsd">XML Schema</a>.</p>
+</div>
+<div class="paragraph">
 <p>In addition it is possible to group properties together in the group element.
 The GUI will show those in their own collapsible section. Allowed child elements
 of group are one description element and instances of the abstract
@@ -1773,7 +1777,7 @@ taking the data and putting it into local storage and then have <code>getValues(
 just read out the local storage.</p>
 </div>
 <div class="paragraph">
-<p>Another thing to consider is the grouping of resource types:  when yo plan on
+<p>Another thing to consider is the grouping of resource types:  when you plan on
 having multiple items of one category (e.g. multiple http servers to check),
 then its good to have a parent for all of those, like the HttpComponent above.
 This is also good practice if you plan on implementing the addition of new child
@@ -1781,7 +1785,7 @@ resources, as the create code needs to be in the parent (HttpComponent for
 HttpServices).</p>
 </div>
 <div class="sect2">
-<h3 id="_decomposing_plugins">Decomposing Plugins</h3>
+<h3 id="decomposing">Decomposing Plugins</h3>
 <div class="paragraph">
 <p>When you try to manage larger systems like the JBoss Application Server with all
 its subsystems like Cache, Transactions, JBossWeb etc. your plugin might get
@@ -1800,11 +1804,11 @@ here).</p>
 <p>The basic trick is to use <code>&lt;depends&gt;</code> and <code>&lt;runs-inside&gt;</code> tags in your plugin
 descriptor for this new plugin:</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre>&lt;plugin name="JBossCache" ... &gt;
-   &lt;depends plugin="JMX" /&gt;
-   &lt;depends plugin="JBossAS" useClasses="true"/&gt;</pre>
+<pre class="highlight"><code class="xml language-xml">&lt;plugin name="JBossCache" ... &gt;
+  &lt;depends plugin="JMX" /&gt;
+  &lt;depends plugin="JBossAS" useClasses="true"/&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1813,21 +1817,17 @@ plugin can start. The attribute <em>useClasses</em> means that the classloader o
 plugin gets access to the classes of the other plugin (JBossAs here). So we can
 use those classes too.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>&lt;service name="JBoss Cache" ...&gt;</pre>
-</div>
-</div>
 <div class="paragraph">
 <p>As you know from previous posts, a service can&#8217;t just "hang in the air" - it
 needs another server or service as a container. This is where runs-inside comes
 into play:</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre> &lt;runs-inside&gt;
-   &lt;parent-resource-type name="JBossAS Server" plugin="JBossAS"/&gt;
-&lt;/runs-inside&gt;</pre>
+<pre class="highlight"><code class="xml language-xml">&lt;service name="JBoss Cache" ...&gt;
+  &lt;runs-inside&gt;
+    &lt;parent-resource-type name="JBossAS Server" plugin="JBossAS"/&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+  &lt;/runs-inside&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2958,7 +2958,7 @@ directory or on sourceforge at
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-04-11 20:42:24 MESZ
+Last updated 2014-04-24 12:15:12 CEST
 </div>
 </div>
 </body>

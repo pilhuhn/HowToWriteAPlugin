@@ -1,0 +1,13 @@
+target/
+test-output/
+eclipse-classes/
+.idea/
+.metadata/
+*cache.html
+*cache.xml
+*.swp
+*.iml
+*.ipr
+*.iws
+*~
+*.DS_Store
