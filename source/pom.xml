@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+<modelVersion>4.0.0</modelVersion>
 
   <artifactId>httptest-plugin-src</artifactId>
   <packaging>pom</packaging>
@@ -70,5 +70,55 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.16</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.rhq.maven.plugins</groupId>
+          <artifactId>rhq-agent-plugin-plugin</artifactId>
+          <version>${rhq-agent-plugin-plugin.version}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <!-- Here comes the project manifest customization  -->
+            <archive>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+              <manifestEntries>
+                <Maven-Version>${maven.version}</Maven-Version>
+                <Java-Version>${java.version}</Java-Version>
+                <Java-Vendor>${java.vendor}</Java-Vendor>
+                <Os-Name>${os.name}</Os-Name>
+                <Os-Arch>${os.arch}</Os-Arch>
+                <Os-Version>${os.version}</Os-Version>
+              </manifestEntries>
+            </archive>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>validate</goal>
+                <goal>deploy</goal>
+              </goals>
+              <configuration>
+                <rhqVersion>${rhq.version}</rhqVersion>
+                <deployDirectory>${dev.container}/rhq-server/plugins/</deployDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

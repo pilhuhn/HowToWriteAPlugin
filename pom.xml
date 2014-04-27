@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+<modelVersion>4.0.0</modelVersion>
 
   <groupId>de.bsd.rhq</groupId>
   <artifactId>plugin-howto-parent</artifactId>
@@ -23,30 +23,20 @@
   </modules>
 
   <build>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.rhq.maven.plugins</groupId>
-          <artifactId>rhq-agent-plugin-plugin</artifactId>
-          <version>${rhq-agent-plugin-plugin.version}</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-      <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-site-plugin</artifactId>
-              <version>3.2</version>
-              <dependencies>
-                  <dependency>
-                      <groupId>org.asciidoctor</groupId>
-                      <artifactId>asciidoctor-maven-plugin</artifactId>
-                      <version>${asciidoctor.version}</version>
-                  </dependency>
-              </dependencies>
-          </plugin>
-      </plugins>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.2</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.asciidoctor</groupId>
+            <artifactId>asciidoctor-maven-plugin</artifactId>
+            <version>${asciidoctor.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
   </build>
+
 </project>
