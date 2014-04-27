@@ -1,0 +1,12 @@
+== How to write a plugin
+
+A tutorial to show how to build plugins for RHQ.
+
+The tutorial text is in doc/how_to.adoc. Or checkout
+doc/how_to.html to read a rendered version.
+
+The source code from the tutorial lives in sources/
+and is explained in the tutorial.
+
+
+
